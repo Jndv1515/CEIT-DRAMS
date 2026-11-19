@@ -13,6 +13,7 @@ return [
         'course' => 'BS Information Technology',
         'organization' => 'CEIT Student Council',
         'organization_role' => 'Senator for Operations and Implementation',
+        'capstone_title' => 'Smart Attendance Monitoring System',
     ],
 
     'stats' => [
