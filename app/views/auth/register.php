@@ -30,9 +30,15 @@
                 </div>
 
                 <div class="field">
-                    <label for="email">Email / Student No.</label>
-                    <input type="text" id="email" name="email" placeholder="Email / Student No."
-                           autocomplete="username" required>
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Email"
+                           autocomplete="email" required>
+                </div>
+
+                <div class="field">
+                    <label for="student-number">Student No.</label>
+                    <input type="text" id="student-number" name="student_number" placeholder="Student No."
+                           autocomplete="off" required>
                 </div>
 
                 <div class="field">
