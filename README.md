@@ -34,6 +34,7 @@ ceit-drams/
 │   │   ├── components/         # Shared fragments (e.g. decision-actions.php)
 │   │   ├── errors/404.php
 │   │   ├── home/index.php      # /dashboard content
+│   │   ├── home/profile.php    # /profile account details
 │   │   ├── layouts/            # main.php, auth.php, dashboard.php, admin.php, header.php, footer.php
 │   │   ├── requests/create.php # /request form
 │   │   ├── requests/index.php  # /requests tabs: requests + document catalog cards
@@ -72,6 +73,7 @@ ceit-drams/
 | `/login`     | Same login screen                             |
 | `/register`  | Registration screen (same style)              |
 | `/dashboard` | Centralized request dashboard                 |
+| `/profile`   | Account details and request activity          |
 | `/admin`     | Admin/staff queue with status filters         |
 | `/admin/action` | POST: approve, reject, forward, or reset   |
 | `/request`   | GET: request form; POST: submit a request     |
@@ -97,6 +99,7 @@ ceit-drams/
 - The request form includes a frontend-only attachment preview using the browser File API: PDF, PNG, JPG, and JPEG render inline before submission; DOC/DOCX show a fallback message.
 - A frontend-only admin/staff dashboard lives at `/admin`. It shares the same request queue, adds Pending / Approved / Forwarded / Rejected filters, and lets staff Approve, Forward, Reject, or Reset requests. Status changes are stored in `$_SESSION['request_statuses']` and are reflected on the requester dashboard, My Requests, and request details. Since authentication is still mocked, `/admin` is a demo entry point rather than a permission-gated area.
 - Optional supporting files (PDF, DOC, DOCX, PNG, JPG, JPEG; max 5 MB) are moved to `storage/uploads/` and served through `/attachment?request=<id>`. The uploads directory is blocked from direct web access; swap this for database-backed storage when the backend is ready.
+- `/profile` shows the demo user's personal information and request activity from `app/data/mock_dashboard.php` and the session queue. The sidebar Profile link now opens this page; editing is deferred until authentication and the database layer are implemented.
 - `login.php` is kept only so existing links keep working; it redirects to `/login`.
 - `index.css` is a stub; the real stylesheet is `assets/css/style.css`.
 - Authentication and the database layer are intentionally left unimplemented.

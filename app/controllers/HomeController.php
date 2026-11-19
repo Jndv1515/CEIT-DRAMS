@@ -33,4 +33,16 @@ final class HomeController extends Controller
             'filter' => $filter,
         ], $mockData), 'layouts/dashboard');
     }
+
+    public function profile(): void
+    {
+        $mockData = require APP_PATH . '/data/mock_dashboard.php';
+
+        $this->view('home/profile', array_merge([
+            'title' => 'Profile',
+            'activeNav' => 'profile',
+            'requests' => queue_requests(),
+            'documentCount' => count(require APP_PATH . '/data/documents.php'),
+        ], $mockData), 'layouts/dashboard');
+    }
 }

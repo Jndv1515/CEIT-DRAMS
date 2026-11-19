@@ -24,6 +24,7 @@ $router->get('/logout', [AuthController::class, 'logout']);
 
 // Placeholder destination after authentication is implemented.
 $router->get('/dashboard', [HomeController::class, 'index']);
+$router->get('/profile', [HomeController::class, 'profile']);
 
 $router->get('/admin', [AdminController::class, 'index']);
 $router->post('/admin/action', [AdminController::class, 'action']);
