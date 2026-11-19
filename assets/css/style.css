@@ -664,6 +664,14 @@ main.container {
     grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 0.8fr);
 }
 
+.queue-table .request-row {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 0.9fr) minmax(0, 0.7fr) minmax(0, 1.2fr);
+}
+
+.queue-empty {
+    color: var(--muted);
+}
+
 .action-links {
     display: flex;
     flex-wrap: wrap;
@@ -679,6 +687,42 @@ main.container {
 
 .action-link:hover {
     text-decoration: underline;
+}
+
+.inline-form {
+    display: inline;
+    margin: 0;
+}
+
+.action-button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #fdba74;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+.action-button:hover {
+    text-decoration: underline;
+}
+
+.action-button-approve {
+    color: #86efac;
+}
+
+.action-button-forward {
+    color: #93c5fd;
+}
+
+.action-button-reject {
+    color: #fca5a5;
+}
+
+.action-button-reset {
+    color: var(--muted);
 }
 
 .request-document {
@@ -748,6 +792,11 @@ main.container {
     color: #fca5a5;
 }
 
+.status-forwarded {
+    background: rgba(59, 130, 246, 0.16);
+    color: #93c5fd;
+}
+
 @media (max-width: 48rem) {
     .dashboard-header {
         flex-direction: column;
@@ -762,7 +811,8 @@ main.container {
         display: none;
     }
 
-    .request-row {
+    .request-row,
+    .queue-table .request-row {
         grid-template-columns: 1fr;
         gap: 0.35rem;
     }

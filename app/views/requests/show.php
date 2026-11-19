@@ -1,6 +1,6 @@
 <section class="page-header">
     <h1 class="page-title">Request Details</h1>
-    <a class="btn-secondary" href="<?= url('/requests') ?>">Back to Requests</a>
+    <a class="btn-secondary" href="<?= url($backUrl ?? '/requests') ?>"><?= e($backLabel ?? 'Back to Requests') ?></a>
 </section>
 
 <section class="card request-card">

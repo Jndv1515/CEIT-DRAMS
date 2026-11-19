@@ -86,13 +86,11 @@ final class RequestController extends Controller
         $view = $_GET['view'] ?? 'requests';
         $view = in_array($view, ['requests', 'documents'], true) ? $view : 'requests';
 
-        $mockData = require APP_PATH . '/data/mock_dashboard.php';
-
         $this->view('requests/index', [
             'title' => 'My Requests',
             'activeNav' => 'requests',
             'activeView' => $view,
-            'requests' => array_merge(submitted_requests(), $mockData['recentRequests']),
+            'requests' => queue_requests(),
             'documents' => require APP_PATH . '/data/documents.php',
         ], 'layouts/dashboard');
     }
@@ -100,15 +98,8 @@ final class RequestController extends Controller
     public function show(): void
     {
         $id = (string) ($_GET['id'] ?? '');
-        $mockData = require APP_PATH . '/data/mock_dashboard.php';
-        $request = null;
-
-        foreach (array_merge(submitted_requests(), $mockData['recentRequests']) as $item) {
-            if (($item['id'] ?? '') === $id) {
-                $request = $item;
-                break;
-            }
-        }
+        $fromAdmin = ($_GET['from'] ?? '') === 'admin';
+        $request = find_request($id);
 
         if ($request === null) {
             http_response_code(404);
@@ -118,9 +109,11 @@ final class RequestController extends Controller
 
         $this->view('requests/show', [
             'title' => 'Request Details',
-            'activeNav' => 'requests',
+            'activeNav' => $fromAdmin ? 'admin' : 'requests',
             'request' => $request,
-        ], 'layouts/dashboard');
+            'backUrl' => $fromAdmin ? '/admin' : '/requests',
+            'backLabel' => $fromAdmin ? 'Back to Admin' : 'Back to Requests',
+        ], $fromAdmin ? 'layouts/admin' : 'layouts/dashboard');
     }
 
     public function documents(): void

@@ -17,10 +17,7 @@ final class HomeController extends Controller
         $context = in_array($context, ['personal', 'organization'], true) ? $context : 'personal';
         $filter = in_array($filter, ['all', 'student', 'organization'], true) ? $filter : 'all';
 
-        $mockData['recentRequests'] = array_merge(
-            submitted_requests(),
-            $mockData['recentRequests']
-        );
+        $mockData['recentRequests'] = queue_requests();
 
         if ($filter !== 'all') {
             $mockData['recentRequests'] = array_values(array_filter(
