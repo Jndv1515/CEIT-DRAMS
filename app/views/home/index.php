@@ -44,7 +44,7 @@
         <section class="stat-grid" aria-label="Request summary">
             <?php foreach ($stats as $stat): ?>
                 <a class="card stat-card" href="<?= url('/dashboard') ?>">
-                    <span class="stat-icon" aria-hidden="true"><?= e($stat['icon']) ?></span>
+                    <span class="stat-icon" aria-hidden="true"><?= icon($stat['icon']) ?></span>
                     <span class="stat-value"><?= e($stat['value']) ?></span>
                     <span class="stat-label"><?= e($stat['label']) ?></span>
                     <span class="stat-trend"><?= e($stat['trend']) ?></span>

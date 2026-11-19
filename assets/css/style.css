@@ -554,8 +554,12 @@ main.container {
     border-radius: 999px;
     background: rgba(234, 88, 12, 0.14);
     color: #fdba74;
-    font-size: 1rem;
-    font-weight: 700;
+}
+
+.stat-icon svg {
+    display: block;
+    width: 1.15rem;
+    height: 1.15rem;
 }
 
 .stat-value {

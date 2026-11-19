@@ -20,19 +20,19 @@ return [
         [
             'label' => 'Pending Requests',
             'value' => '04',
-            'icon' => '◷',
+            'icon' => 'clock',
             'trend' => '+2 this week',
         ],
         [
             'label' => 'Approved',
             'value' => '09',
-            'icon' => '✓',
+            'icon' => 'check',
             'trend' => '+3 this month',
         ],
         [
             'label' => 'Available Documents',
             'value' => '06',
-            'icon' => '▤',
+            'icon' => 'document',
             'trend' => '2 new forms',
         ],
     ],
