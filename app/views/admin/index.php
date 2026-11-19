@@ -1,35 +1,20 @@
 <?php
-$actionButton = static function (
-    array $request,
-    string $status,
-    string $label,
-    string $variant,
-    string $iconName,
-    bool $confirm = false
-) use ($statusFilter): void {
-    $id = (string) ($request['id'] ?? '');
-    $document = (string) ($request['document'] ?? '');
-    $buttonClass = $variant === 'approve'
-        ? 'btn-primary'
-        : ($variant === 'reject' ? 'btn-danger' : 'btn-ghost');
-    ?>
-    <form class="inline-form" method="post" action="<?= url('/admin/action') ?>" data-decision-form>
-        <input type="hidden" name="id" value="<?= e($id) ?>">
-        <input type="hidden" name="document" value="<?= e($document) ?>">
-        <input type="hidden" name="status" value="<?= e($status) ?>">
-        <input type="hidden" name="filter" value="<?= e($statusFilter) ?>">
-        <input type="hidden" name="reason" value="" data-reason>
-        <button type="submit"
-                class="btn-sm <?= $buttonClass ?> btn-icon"
-                data-action="<?= e($status) ?>"
-                <?= $confirm ? 'data-confirm="true"' : '' ?>
-                aria-label="<?= e($label . ' ' . $document . ' (' . $id . ')') ?>">
-            <?= icon($iconName) ?>
-            <span><?= e($label) ?></span>
-        </button>
-    </form>
-    <?php
+$queueQuery = static function (string $status = 'all') use ($statusFilter, $search, $sort): string {
+    $params = [];
+
+    if ($status !== 'all') {
+        $params['status'] = $status;
+    }
+    if ($search !== '') {
+        $params['q'] = $search;
+    }
+    if ($sort !== 'date-desc') {
+        $params['sort'] = $sort;
+    }
+
+    return $params === [] ? '' : '?' . http_build_query($params);
 };
+$hasFilters = $statusFilter !== 'all' || $search !== '' || $sort !== 'date-desc';
 ?>
 <section class="page-header">
     <div>
@@ -50,7 +35,9 @@ $actionButton = static function (
     ];
     ?>
     <?php foreach ($cards as $card): ?>
-        <a class="card stat-card" href="<?= url('/admin') ?>?status=<?= e($card['status']) ?>">
+        <a class="card stat-card <?= $statusFilter === $card['status'] ? 'is-selected' : '' ?>"
+           href="<?= url('/admin') ?><?= $queueQuery($card['status']) ?>"
+           <?= $statusFilter === $card['status'] ? 'aria-current="page"' : '' ?>>
             <span class="stat-icon" aria-hidden="true"><?= icon($card['icon']) ?></span>
             <span class="stat-value"><?= str_pad((string) ($counts[$card['status']] ?? 0), 2, '0', STR_PAD_LEFT) ?></span>
             <span class="stat-label"><?= e($card['label']) ?></span>
@@ -61,12 +48,34 @@ $actionButton = static function (
 <nav class="view-tabs" role="tablist" aria-label="Filter request queue">
     <?php foreach (array_merge(['all'], request_statuses()) as $status): ?>
         <a class="view-tab <?= $statusFilter === $status ? 'active' : '' ?>"
-           href="<?= url('/admin') ?><?= $status === 'all' ? '' : '?status=' . e($status) ?>"
+           href="<?= url('/admin') ?><?= $queueQuery($status) ?>"
            role="tab" aria-selected="<?= $statusFilter === $status ? 'true' : 'false' ?>">
             <?= $status === 'all' ? 'All' : e(ucfirst($status)) ?>
         </a>
     <?php endforeach; ?>
 </nav>
+
+<section class="card queue-tools-card" aria-label="Queue tools">
+    <form class="queue-tools" method="get" action="<?= url('/admin') ?>">
+        <input type="search" name="q" value="<?= e($search) ?>"
+               placeholder="Search reference, document, requester…" aria-label="Search requests">
+        <?php if ($statusFilter !== 'all'): ?>
+            <input type="hidden" name="status" value="<?= e($statusFilter) ?>">
+        <?php endif; ?>
+        <label class="sr-only" for="queue-sort">Sort requests</label>
+        <select id="queue-sort" name="sort">
+            <option value="date-desc" <?= $sort === 'date-desc' ? 'selected' : '' ?>>Newest first</option>
+            <option value="date-asc" <?= $sort === 'date-asc' ? 'selected' : '' ?>>Oldest first</option>
+            <option value="document-asc" <?= $sort === 'document-asc' ? 'selected' : '' ?>>Document A–Z</option>
+            <option value="status-asc" <?= $sort === 'status-asc' ? 'selected' : '' ?>>Status</option>
+        </select>
+        <button type="submit" class="btn-ghost btn-sm">Apply</button>
+        <?php if ($hasFilters): ?>
+            <a class="action-link" href="<?= url('/admin') ?>">Clear</a>
+        <?php endif; ?>
+    </form>
+    <p class="queue-count">Showing <?= count($requests) ?> of <?= (int) $totalRequests ?> requests</p>
+</section>
 
 <section class="card" role="tabpanel" aria-label="Request queue">
     <?php if ($requests === []): ?>
@@ -92,7 +101,8 @@ $actionButton = static function (
 
             <?php foreach ($requests as $request): ?>
                 <?php $status = (string) ($request['status'] ?? 'pending'); ?>
-                <div class="request-row" role="row">
+                <div class="request-row" role="row"
+                     data-request-id="<?= e((string) ($request['id'] ?? '')) ?>" tabindex="-1">
                     <span role="cell" data-label="Document">
                         <span class="request-document"><?= e((string) ($request['document'] ?? '')) ?></span>
                     </span>
@@ -110,13 +120,7 @@ $actionButton = static function (
                         <span class="action-links">
                             <a class="action-link"
                                href="<?= url('/request-details') ?>?id=<?= e((string) ($request['id'] ?? '')) ?>&amp;from=admin">View</a>
-                            <?php if ($status === 'pending' || $status === 'processing'): ?>
-                                <?php $actionButton($request, 'approved', 'Approve', 'approve', 'check'); ?>
-                                <?php $actionButton($request, 'forwarded', 'Forward', 'forward', 'forward'); ?>
-                                <?php $actionButton($request, 'rejected', 'Reject', 'reject', 'x', true); ?>
-                            <?php else: ?>
-                                <?php $actionButton($request, 'pending', 'Reset', 'reset', 'rotate', true); ?>
-                            <?php endif; ?>
+                            <?php require __DIR__ . '/../components/decision-actions.php'; ?>
                         </span>
                     </span>
                 </div>
@@ -125,18 +129,3 @@ $actionButton = static function (
     <?php endif; ?>
 </section>
 
-<dialog class="confirm-dialog" id="decision-dialog" aria-labelledby="decision-dialog-title" aria-describedby="decision-dialog-description">
-    <div class="confirm-dialog-head">
-        <h2 id="decision-dialog-title">Confirm action</h2>
-        <p id="decision-dialog-description">Are you sure you want to continue?</p>
-    </div>
-    <div class="confirm-dialog-body" id="decision-dialog-reason-field" hidden>
-        <label for="decision-reason">Reason <span class="required">*</span></label>
-        <textarea id="decision-reason" minlength="10" placeholder="Explain why this request is being rejected."></textarea>
-        <p class="dialog-error" id="decision-dialog-error" hidden>Please enter a reason of at least 10 characters.</p>
-    </div>
-    <div class="confirm-dialog-actions">
-        <button type="button" class="btn-ghost btn-sm" id="decision-cancel">Cancel</button>
-        <button type="button" class="btn-danger btn-sm" id="decision-confirm">Confirm</button>
-    </div>
-</dialog>

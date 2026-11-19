@@ -44,6 +44,36 @@ $isCurrent = static fn (string $key): string => $activeNav === $key ? ' aria-cur
         </div>
     </div>
 
+    <dialog class="confirm-dialog" id="decision-dialog" aria-labelledby="decision-dialog-title" aria-describedby="decision-dialog-description">
+        <div class="confirm-dialog-head">
+            <h2 id="decision-dialog-title">Confirm action</h2>
+            <p id="decision-dialog-description">Are you sure you want to continue?</p>
+        </div>
+        <div class="confirm-dialog-body" id="decision-dialog-reason-field" hidden>
+            <label for="decision-reason">Reason <span class="required">*</span></label>
+            <textarea id="decision-reason" minlength="10" placeholder="Explain why this request is being rejected."></textarea>
+            <p class="dialog-error" id="decision-dialog-error" hidden>Please enter a reason of at least 10 characters.</p>
+        </div>
+        <div class="confirm-dialog-actions">
+            <button type="button" class="btn-ghost btn-sm" id="decision-cancel">Cancel</button>
+            <button type="button" class="btn-danger btn-sm" id="decision-confirm">Confirm</button>
+        </div>
+    </dialog>
+
+    <?php $focusId = $_SESSION['focus_request_id'] ?? null; ?>
+    <?php unset($_SESSION['focus_request_id']); ?>
+    <?php if (is_string($focusId) && $focusId !== ''): ?>
+        <script>
+            (function () {
+                var row = document.querySelector('[data-request-id=' + <?= json_encode($focusId, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?> + ']');
+                if (row) {
+                    row.focus();
+                    row.scrollIntoView({ block: 'center' });
+                }
+            })();
+        </script>
+    <?php endif; ?>
+
     <script src="<?= url('assets/js/app.js') ?>?v=<?= filemtime(BASE_PATH . '/assets/js/app.js') ?>"></script>
     <script src="<?= url('assets/js/admin.js') ?>?v=<?= filemtime(BASE_PATH . '/assets/js/admin.js') ?>"></script>
 </body>

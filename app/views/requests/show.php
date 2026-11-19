@@ -3,6 +3,21 @@
     <a class="btn-secondary" href="<?= url($backUrl ?? '/requests') ?>"><?= e($backLabel ?? 'Back to Requests') ?></a>
 </section>
 
+<?php if (!empty($fromAdmin)): ?>
+    <section class="card decision-bar" aria-label="Staff decision">
+        <div class="decision-bar-meta">
+            <span class="page-eyebrow">Staff review</span>
+            <strong><?= e($request['document']) ?></strong>
+            <span class="status status-<?= e((string) ($request['status'] ?? 'pending')) ?>">
+                <?= e(ucfirst((string) ($request['status'] ?? 'pending'))) ?>
+            </span>
+        </div>
+        <span class="action-links">
+            <?php require __DIR__ . '/../components/decision-actions.php'; ?>
+        </span>
+    </section>
+<?php endif; ?>
+
 <section class="card request-card">
     <dl class="detail-list">
         <div>

@@ -110,6 +110,7 @@ final class RequestController extends Controller
         $this->view('requests/show', [
             'title' => 'Request Details',
             'activeNav' => $fromAdmin ? 'admin' : 'requests',
+            'fromAdmin' => $fromAdmin,
             'request' => $request,
             'backUrl' => $fromAdmin ? '/admin' : '/requests',
             'backLabel' => $fromAdmin ? 'Back to Admin' : 'Back to Requests',
