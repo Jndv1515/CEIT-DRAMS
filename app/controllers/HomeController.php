@@ -9,9 +9,11 @@ final class HomeController extends Controller
 {
     public function index(): void
     {
-        $this->view('home/index', [
+        $mockData = require APP_PATH . '/data/mock_dashboard.php';
+
+        $this->view('home/index', array_merge([
             'title' => 'Dashboard',
             'showSiteChrome' => false,
-        ]);
+        ], $mockData));
     }
 }

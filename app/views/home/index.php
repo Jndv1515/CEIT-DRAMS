@@ -10,25 +10,20 @@
     <img src="<?= url('assets/images/cvsu_logo.png') ?>" alt="CVSU CEIT logo" class="dashboard-logo">
     <div>
         <p class="dashboard-brand-name">CVSU - CEIT</p>
-        <p class="dashboard-greeting">Welcome, <strong>Keith Montenegro</strong></p>
+        <p class="dashboard-greeting">Welcome, <strong><?= e($user['name']) ?></strong></p>
+        <p class="dashboard-meta">
+            <?= e($user['student_number']) ?> &middot; <?= e($user['course']) ?>
+        </p>
     </div>
 </section>
 
 <section class="stat-grid" aria-label="Request summary">
-    <article class="card stat-card">
-        <p class="stat-value">03</p>
-        <h2 class="stat-label">Pending Requests</h2>
-    </article>
-
-    <article class="card stat-card">
-        <p class="stat-value">12</p>
-        <h2 class="stat-label">Approved</h2>
-    </article>
-
-    <article class="card stat-card">
-        <p class="stat-value">05</p>
-        <h2 class="stat-label">Available</h2>
-    </article>
+    <?php foreach ($stats as $stat): ?>
+        <article class="card stat-card">
+            <p class="stat-value"><?= e($stat['value']) ?></p>
+            <h2 class="stat-label"><?= e($stat['label']) ?></h2>
+        </article>
+    <?php endforeach; ?>
 </section>
 
 <div class="dashboard-grid">
@@ -50,17 +45,17 @@
                 <span role="columnheader">Status</span>
             </div>
 
-            <div class="request-row" role="row">
-                <span role="cell">Thesis Proposal</span>
-                <span role="cell">Nov 18, 2026</span>
-                <span role="cell"><span class="status status-pending">Pending</span></span>
-            </div>
-
-            <div class="request-row" role="row">
-                <span role="cell">Event Proposal</span>
-                <span role="cell">Nov 17, 2026</span>
-                <span role="cell"><span class="status status-approved">Approved</span></span>
-            </div>
+            <?php foreach ($recentRequests as $request): ?>
+                <div class="request-row" role="row">
+                    <span role="cell"><?= e($request['document']) ?></span>
+                    <span role="cell"><?= e($request['date']) ?></span>
+                    <span role="cell">
+                        <span class="status status-<?= e($request['status']) ?>">
+                            <?= e(ucfirst($request['status'])) ?>
+                        </span>
+                    </span>
+                </div>
+            <?php endforeach; ?>
         </div>
     </section>
 </div>

@@ -402,6 +402,12 @@ main.container {
     color: var(--primary-light);
 }
 
+.dashboard-meta {
+    margin: 0.15rem 0 0;
+    color: var(--muted);
+    font-size: 0.8125rem;
+}
+
 .stat-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
