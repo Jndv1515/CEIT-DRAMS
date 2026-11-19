@@ -6,14 +6,10 @@
         </a>
 
         <nav class="sidebar-nav" aria-label="Dashboard sections">
-            <a class="<?= ($context === 'personal' && $filter === 'all') ? 'active' : '' ?>"
-               href="<?= url('/dashboard') ?>?context=personal&amp;filter=all"
-               <?= ($context === 'personal' && $filter === 'all') ? 'aria-current="page"' : '' ?>>Overview</a>
-            <a href="<?= url('/dashboard') ?>?context=<?= e($context) ?>&amp;filter=all">Requests</a>
-            <a href="<?= url('/dashboard') ?>?context=<?= e($context) ?>&amp;filter=student">Documents</a>
-            <a class="<?= $context === 'organization' ? 'active' : '' ?>"
-               href="<?= url('/dashboard') ?>?context=organization&amp;filter=organization"
-               <?= $context === 'organization' ? 'aria-current="page"' : '' ?>>Organizations</a>
+            <a class="active" href="<?= url('/dashboard') ?>" aria-current="page">Overview</a>
+            <a href="<?= url('/dashboard') ?>">Requests</a>
+            <a href="<?= url('/dashboard') ?>">Documents</a>
+            <a href="<?= url('/dashboard') ?>">Organizations</a>
             <a href="<?= url('/dashboard') ?>">Profile</a>
         </nav>
 
@@ -23,7 +19,6 @@
     <div class="dashboard-content">
         <section class="dashboard-header">
             <div>
-                <p class="dashboard-eyebrow">CVSU - CEIT</p>
                 <h1 class="dashboard-title">Document Requests Dashboard</h1>
             </div>
 
@@ -81,10 +76,7 @@
             </section>
 
             <section class="card dashboard-card">
-                <div class="card-heading">
-                    <h2 class="card-title">Recent Requests</h2>
-                    <a class="card-link" href="<?= url('/dashboard') ?>">View All</a>
-                </div>
+                <h2 class="card-title">Recent Requests</h2>
 
                 <div class="filter-chips" role="group" aria-label="Filter requests">
                     <a class="chip <?= $filter === 'all' ? 'active' : '' ?>"
