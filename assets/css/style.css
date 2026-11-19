@@ -722,6 +722,11 @@ main.container {
     color: #86efac;
 }
 
+.status-rejected {
+    background: rgba(239, 68, 68, 0.16);
+    color: #fca5a5;
+}
+
 @media (max-width: 48rem) {
     .dashboard-header {
         flex-direction: column;
@@ -923,6 +928,25 @@ main.container {
 
 .attachment-link:hover {
     text-decoration: underline;
+}
+
+.attachment-icon {
+    display: inline-flex;
+    margin-left: 0.4rem;
+    color: #fdba74;
+    vertical-align: middle;
+}
+
+.attachment-icon svg {
+    width: 0.85rem;
+    height: 0.85rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+}
+
+.attachment-icon:hover {
+    color: var(--primary-light);
 }
 
 .request-form select:focus,

@@ -1,10 +1,5 @@
 <section class="page-header">
-    <div>
-        <p class="page-eyebrow">Document Forward Request Module</p>
-        <h1 class="page-title">My Requests</h1>
-        <p class="page-subtitle">All submitted requests and sample records in one queue.</p>
-    </div>
-    <a class="btn" href="<?= url('/request') ?>">Request a Document</a>
+    <h1 class="page-title">My Requests</h1>
 </section>
 
 <section class="card">
@@ -18,23 +13,18 @@
         <?php foreach ($requests as $request): ?>
             <div class="request-row" role="row">
                 <span role="cell" data-label="Document">
-                    <span class="request-document"><?= e($request['document']) ?></span>
-                    <span class="request-category">
-                        <?= e($request['category']) ?>
-                        <?php if (isset($request['id'])): ?>
-                            &middot; <?= e($request['id']) ?>
+                    <span class="request-document">
+                        <?= e($request['document']) ?>
+                        <?php if (!empty($request['attachment_name'])): ?>
+                            <a class="attachment-icon"
+                               href="<?= url('/attachment') ?>?request=<?= e($request['id']) ?>"
+                               target="_blank" rel="noopener"
+                               title="<?= e($request['attachment_name']) ?>"
+                               aria-label="Open <?= e($request['attachment_name']) ?>">
+                                <?= icon('document') ?>
+                            </a>
                         <?php endif; ?>
                     </span>
-                    <span class="requester-badge requester-badge-<?= e($request['type']) ?>">
-                        <?= e(ucfirst($request['type'])) ?>
-                    </span>
-                    <?php if (!empty($request['attachment_name'])): ?>
-                        <a class="attachment-link"
-                           href="<?= url('/attachment') ?>?request=<?= e($request['id']) ?>"
-                           target="_blank" rel="noopener">
-                            <?= icon('document') ?> <?= e($request['attachment_name']) ?>
-                        </a>
-                    <?php endif; ?>
                 </span>
                 <span role="cell" data-label="Date Requested"><?= e($request['date']) ?></span>
                 <span role="cell" data-label="Status">
