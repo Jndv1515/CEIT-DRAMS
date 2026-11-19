@@ -40,7 +40,9 @@ ceit-drams/
 │   ├── css/style.css           # Login + dashboard styles (dark by default)
 │   ├── js/app.js               # Reserved for site-wide scripts
 │   └── images/cvsu_logo.png
-├── storage/logs/               # Runtime files (logs, uploads later)
+├── storage/
+│   ├── logs/                   # Runtime logs
+│   └── uploads/                # Request attachments (not web-accessible)
 ├── .htaccess                   # Rewrite rules + access restrictions
 ├── index.php                   # Front controller — all routes enter here
 ├── login.php                   # Legacy redirect to /login
@@ -68,6 +70,7 @@ ceit-drams/
 | `/request`   | GET: request form; POST: submit a request     |
 | `/requests`  | Submitted and sample requests                 |
 | `/documents` | Available document types                      |
+| `/attachment`| Streams a session request's uploaded file     |
 | `/logout`    | Redirects back to `/login`                    |
 
 ## Notes
@@ -80,6 +83,7 @@ ceit-drams/
 - The dashboard is centralized for student and organization requests: a Personal / Organization context switcher, request-type filters, and requester badges share one queue. It keeps the responsive sidebar, clickable stat cards, and labeled mobile rows in the dark/orange theme.
 - Dashboard content comes from `app/data/mock_dashboard.php`; swap it for database queries when the backend is ready. Sample scenarios cover capstone/thesis and student organization document requests.
 - The Document Forward Request module is frontend-only: `/request` validates and stores submissions in `$_SESSION`, redirects with a flash message, and the new Pending request appears at the top of Recent Requests and My Requests. Document types come from `app/data/documents.php`; the requester type is derived from the selected document, not from the dashboard context.
+- Optional supporting files (PDF, DOC, DOCX, PNG, JPG, JPEG; max 5 MB) are moved to `storage/uploads/` and served through `/attachment?request=<id>`. The uploads directory is blocked from direct web access; swap this for database-backed storage when the backend is ready.
 - `login.php` is kept only so existing links keep working; it redirects to `/login`.
 - `index.css` is a stub; the real stylesheet is `assets/css/style.css`.
 - Authentication and the database layer are intentionally left unimplemented.

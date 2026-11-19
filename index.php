@@ -28,5 +28,6 @@ $router->get('/request', [RequestController::class, 'create']);
 $router->post('/request', [RequestController::class, 'store']);
 $router->get('/requests', [RequestController::class, 'index']);
 $router->get('/documents', [RequestController::class, 'documents']);
+$router->get('/attachment', [RequestController::class, 'attachment']);
 
 $router->dispatch();

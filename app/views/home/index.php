@@ -81,6 +81,13 @@
                         <span class="requester-badge requester-badge-<?= e($request['type']) ?>">
                             <?= e(ucfirst($request['type'])) ?>
                         </span>
+                        <?php if (!empty($request['attachment_name'])): ?>
+                            <a class="attachment-link"
+                               href="<?= url('/attachment') ?>?request=<?= e($request['id']) ?>"
+                               target="_blank" rel="noopener">
+                                <?= icon('document') ?> <?= e($request['attachment_name']) ?>
+                            </a>
+                        <?php endif; ?>
                     </span>
                     <span role="cell" data-label="Date Requested"><?= e($request['date']) ?></span>
                     <span role="cell" data-label="Status">
