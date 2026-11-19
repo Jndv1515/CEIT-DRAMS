@@ -1,6 +1,76 @@
 // Site-wide JavaScript.
 
 (function () {
+    initTabs();
+    initAttachmentPreview();
+})();
+
+/**
+ * Roving-tabindex keyboard support for the filter/tab links.
+ * Arrow keys move focus; Enter still activates the link.
+ */
+function initTabs() {
+    if (!document.querySelectorAll) {
+        return;
+    }
+
+    document.querySelectorAll('.view-tabs[role="tablist"]').forEach(function (list) {
+        const tabs = Array.from(list.querySelectorAll('[role="tab"]'));
+
+        if (tabs.length < 2) {
+            return;
+        }
+
+        const selectedIndex = Math.max(
+            0,
+            tabs.findIndex(function (tab) {
+                return tab.getAttribute('aria-selected') === 'true';
+            })
+        );
+
+        function focusTab(index) {
+            tabs.forEach(function (tab, position) {
+                tab.setAttribute('tabindex', position === index ? '0' : '-1');
+            });
+            tabs[index].focus();
+        }
+
+        tabs.forEach(function (tab, index) {
+            tab.setAttribute('tabindex', index === selectedIndex ? '0' : '-1');
+        });
+
+        list.addEventListener('keydown', function (event) {
+            let nextIndex = null;
+
+            if (event.key === 'ArrowRight') {
+                nextIndex = tabs.indexOf(document.activeElement) + 1;
+            } else if (event.key === 'ArrowLeft') {
+                nextIndex = tabs.indexOf(document.activeElement) - 1;
+            } else if (event.key === 'Home') {
+                nextIndex = 0;
+            } else if (event.key === 'End') {
+                nextIndex = tabs.length - 1;
+            } else {
+                return;
+            }
+
+            event.preventDefault();
+
+            if (nextIndex === null || nextIndex < 0) {
+                nextIndex = tabs.indexOf(document.activeElement) === -1
+                    ? selectedIndex
+                    : tabs.indexOf(document.activeElement);
+            }
+
+            focusTab((nextIndex + tabs.length) % tabs.length);
+        });
+    });
+}
+
+/**
+ * Frontend preview for request attachments.
+ */
+function initAttachmentPreview() {
     const input = document.getElementById('attachment');
     const panel = document.getElementById('attachment-preview');
     const title = document.getElementById('attachment-preview-title');
@@ -85,4 +155,4 @@
     });
 
     window.addEventListener('beforeunload', releaseObjectUrl);
-})();
+}

@@ -35,7 +35,8 @@
                     <span role="cell" data-label="Actions">
                         <span class="action-links">
                             <a class="action-link"
-                               href="<?= url('/request') ?>?document=<?= rawurlencode($document['name']) ?>">Request</a>
+                               href="<?= url('/request') ?>?document=<?= rawurlencode($document['name']) ?>"
+                               aria-label="Request <?= e($document['name']) ?>">Request</a>
                         </span>
                     </span>
                 </div>
@@ -44,40 +45,52 @@
     </section>
 <?php else: ?>
     <section class="card" role="tabpanel" aria-label="My requests">
-        <div class="request-table request-table-actions" role="table" aria-label="My document requests">
-            <div class="request-row request-head" role="row">
-                <span role="columnheader">Document</span>
-                <span role="columnheader">Date Requested</span>
-                <span role="columnheader">Status</span>
-                <span role="columnheader">Actions</span>
-            </div>
-
-            <?php foreach ($requests as $request): ?>
-                <div class="request-row" role="row">
-                    <span role="cell" data-label="Document">
-                        <span class="request-document"><?= e($request['document']) ?></span>
-                    </span>
-                    <span role="cell" data-label="Date Requested"><?= e($request['date']) ?></span>
-                    <span role="cell" data-label="Status">
-                        <span class="status status-<?= e($request['status']) ?>">
-                            <?= e(ucfirst($request['status'])) ?>
-                        </span>
-                    </span>
-                    <span role="cell" data-label="Actions">
-                        <span class="action-links">
-                            <?php if (!empty($request['id'])): ?>
-                                <a class="action-link"
-                                   href="<?= url('/request-details') ?>?id=<?= e($request['id']) ?>">View</a>
-                            <?php endif; ?>
-                            <?php if (!empty($request['attachment_name'])): ?>
-                                <a class="action-link"
-                                   href="<?= url('/attachment') ?>?request=<?= e($request['id']) ?>"
-                                   target="_blank" rel="noopener">Download</a>
-                            <?php endif; ?>
-                        </span>
-                    </span>
+        <?php if ($requests === []): ?>
+            <?= empty_state([
+                'title' => 'No requests yet',
+                'message' => 'Submit a document request and track its status here.',
+                'actionLabel' => 'Request a Document',
+                'actionUrl' => url('/request'),
+                'icon' => 'document',
+            ]) ?>
+        <?php else: ?>
+            <div class="request-table request-table-actions" role="table" aria-label="My document requests">
+                <div class="request-row request-head" role="row">
+                    <span role="columnheader">Document</span>
+                    <span role="columnheader">Date Requested</span>
+                    <span role="columnheader">Status</span>
+                    <span role="columnheader">Actions</span>
                 </div>
-            <?php endforeach; ?>
-        </div>
+
+                <?php foreach ($requests as $request): ?>
+                    <div class="request-row" role="row">
+                        <span role="cell" data-label="Document">
+                            <span class="request-document"><?= e($request['document']) ?></span>
+                        </span>
+                        <span role="cell" data-label="Date Requested"><?= e($request['date']) ?></span>
+                        <span role="cell" data-label="Status">
+                            <span class="status status-<?= e($request['status']) ?>">
+                                <?= e(ucfirst($request['status'])) ?>
+                            </span>
+                        </span>
+                        <span role="cell" data-label="Actions">
+                            <span class="action-links">
+                                <?php if (!empty($request['id'])): ?>
+                                    <a class="action-link"
+                                       href="<?= url('/request-details') ?>?id=<?= e($request['id']) ?>">View</a>
+                                <?php endif; ?>
+                                <?php if (!empty($request['attachment_name'])): ?>
+                                    <a class="action-link attachment-action"
+                                       href="<?= url('/attachment') ?>?request=<?= e($request['id']) ?>"
+                                       aria-label="Download supporting file for <?= e($request['document']) ?>">
+                                        <?= icon('paperclip') ?> Supporting file
+                                    </a>
+                                <?php endif; ?>
+                            </span>
+                        </span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
     </section>
 <?php endif; ?>

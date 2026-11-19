@@ -75,7 +75,7 @@ final class RequestController extends Controller
             'notes' => $notes,
         ], $this->handleAttachment()));
 
-        set_flash('Request submitted. It now appears in your recent requests.');
+        set_flash('Request submitted. It now appears in your recent requests.', 'success');
         $this->redirect($type === 'organization'
             ? '/dashboard?context=organization&filter=organization'
             : '/dashboard?context=personal&filter=all');
@@ -88,7 +88,7 @@ final class RequestController extends Controller
 
         $this->view('requests/index', [
             'title' => 'My Requests',
-            'activeNav' => 'requests',
+            'activeNav' => $view === 'documents' ? 'documents' : 'requests',
             'activeView' => $view,
             'requests' => queue_requests(),
             'documents' => require APP_PATH . '/data/documents.php',
@@ -229,7 +229,7 @@ final class RequestController extends Controller
 
     private function fail(string $message): void
     {
-        set_flash($message);
+        set_flash($message, 'error');
         $this->redirect('/request');
     }
 }

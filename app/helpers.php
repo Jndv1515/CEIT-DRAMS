@@ -33,18 +33,43 @@ if (!function_exists('e')) {
 }
 
 if (!function_exists('set_flash')) {
-    function set_flash(string $message): void
+    /**
+     * @param 'info'|'success'|'error' $type
+     */
+    function set_flash(string $message, string $type = 'info'): void
     {
-        $_SESSION['flash'] = $message;
+        if (!in_array($type, ['info', 'success', 'error'], true)) {
+            $type = 'info';
+        }
+
+        $_SESSION['flash'] = ['message' => $message, 'type' => $type];
     }
 }
 
 if (!function_exists('take_flash')) {
-    function take_flash(): ?string
+    /**
+     * @return array{message: string, type: string}|null
+     */
+    function take_flash(): ?array
     {
-        $message = $_SESSION['flash'] ?? null;
+        $flash = $_SESSION['flash'] ?? null;
         unset($_SESSION['flash']);
-        return $message;
+
+        // Backwards compatibility with flashes stored as plain strings.
+        if (is_string($flash)) {
+            return ['message' => $flash, 'type' => 'info'];
+        }
+
+        if (!is_array($flash) || !isset($flash['message'])) {
+            return null;
+        }
+
+        $type = (string) ($flash['type'] ?? 'info');
+
+        return [
+            'message' => (string) $flash['message'],
+            'type' => in_array($type, ['info', 'success', 'error'], true) ? $type : 'info',
+        ];
     }
 }
 
@@ -78,7 +103,7 @@ if (!function_exists('request_statuses')) {
      */
     function request_statuses(): array
     {
-        return ['pending', 'approved', 'rejected', 'forwarded'];
+        return ['pending', 'processing', 'approved', 'rejected', 'forwarded'];
     }
 }
 
@@ -164,9 +189,14 @@ if (!function_exists('icon')) {
     {
         $paths = [
             'clock' => '<circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>',
+            'progress' => '<path d="M12 3a9 9 0 1 1-9 9"></path><path d="M12 7v5l3 2"></path>',
             'check' => '<path d="M5 13l4 4L19 7"></path>',
             'x' => '<path d="M6 6l12 12M18 6L6 18"></path>',
             'forward' => '<path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path>',
+            'rotate' => '<path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path>',
+            'paperclip' => '<path d="M21 11.5 12.5 20a5 5 0 0 1-7-7l9-9a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8"></path>',
+            'alert' => '<circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path>',
+            'info' => '<circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path>',
             'document' => '<path d="M7 3h7l5 5v13H7z"></path><path d="M14 3v5h5"></path><path d="M10 13h6M10 17h6"></path>',
         ];
 
@@ -176,5 +206,35 @@ if (!function_exists('icon')) {
             . 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'
             . $body
             . '</svg>';
+    }
+}
+
+if (!function_exists('empty_state')) {
+    /**
+     * Reusable empty state with an optional action link.
+     *
+     * @param array{title?: string, message?: string, actionLabel?: string, actionUrl?: string, icon?: string} $options
+     */
+    function empty_state(array $options = []): string
+    {
+        $title = (string) ($options['title'] ?? 'Nothing here yet');
+        $message = (string) ($options['message'] ?? '');
+        $actionLabel = (string) ($options['actionLabel'] ?? '');
+        $actionUrl = (string) ($options['actionUrl'] ?? '');
+        $iconName = (string) ($options['icon'] ?? 'document');
+
+        $html = '<div class="empty-state" role="status">'
+            . '<span class="empty-state-icon" aria-hidden="true">' . icon($iconName) . '</span>'
+            . '<p class="empty-state-title">' . e($title) . '</p>';
+
+        if ($message !== '') {
+            $html .= '<p class="empty-state-message">' . e($message) . '</p>';
+        }
+
+        if ($actionLabel !== '' && $actionUrl !== '') {
+            $html .= '<a class="btn-ghost btn-sm" href="' . e($actionUrl) . '">' . e($actionLabel) . '</a>';
+        }
+
+        return $html . '</div>';
     }
 }

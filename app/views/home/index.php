@@ -81,8 +81,8 @@
                         <?php if (!empty($request['attachment_name'])): ?>
                             <a class="attachment-link"
                                href="<?= url('/attachment') ?>?request=<?= e($request['id']) ?>"
-                               target="_blank" rel="noopener">
-                                <?= icon('document') ?> <?= e($request['attachment_name']) ?>
+                               aria-label="Download <?= e($request['attachment_name']) ?>">
+                                <?= icon('paperclip') ?> <?= e($request['attachment_name']) ?>
                             </a>
                         <?php endif; ?>
                     </span>

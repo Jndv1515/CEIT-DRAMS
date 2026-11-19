@@ -10,6 +10,8 @@ $isCurrent = static fn (string $key): string => $activeNav === $key ? ' aria-cur
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($title ?? 'CEIT DRAMS') ?></title>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet">
     <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= filemtime(BASE_PATH . '/assets/css/style.css') ?>">
 </head>
 <body>
@@ -24,6 +26,7 @@ $isCurrent = static fn (string $key): string => $activeNav === $key ? ' aria-cur
                 <a class="<?= $isActive('dashboard') ?>" href="<?= url('/dashboard') ?>"<?= $isCurrent('dashboard') ?>>Dashboard</a>
                 <a class="<?= $isActive('request') ?>" href="<?= url('/request') ?>"<?= $isCurrent('request') ?>>Request Document</a>
                 <a class="<?= $isActive('requests') ?>" href="<?= url('/requests') ?>"<?= $isCurrent('requests') ?>>My Requests</a>
+                <a class="<?= $isActive('documents') ?>" href="<?= url('/documents') ?>"<?= $isCurrent('documents') ?>>Available Documents</a>
                 <a class="<?= $isActive('profile') ?>" href="<?= url('/dashboard') ?>"<?= $isCurrent('profile') ?>>Profile</a>
             </nav>
 
@@ -33,7 +36,10 @@ $isCurrent = static fn (string $key): string => $activeNav === $key ? ' aria-cur
         <div class="dashboard-content">
             <?php $flash = take_flash(); ?>
             <?php if ($flash !== null): ?>
-                <div class="flash" role="status"><?= e($flash) ?></div>
+                <div class="flash flash-<?= e($flash['type']) ?>" role="<?= $flash['type'] === 'error' ? 'alert' : 'status' ?>">
+                    <?= icon($flash['type'] === 'success' ? 'check' : ($flash['type'] === 'error' ? 'alert' : 'info')) ?>
+                    <span class="flash-message"><?= e($flash['message']) ?></span>
+                </div>
             <?php endif; ?>
 
             <?= $content ?>
