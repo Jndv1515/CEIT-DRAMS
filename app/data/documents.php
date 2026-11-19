@@ -7,5 +7,6 @@ declare(strict_types=1);
 return [
     ['name' => 'Thesis Proposal', 'category' => 'Thesis · Individual', 'type' => 'student'],
     ['name' => 'Event Proposal', 'category' => 'Student Organization', 'type' => 'organization'],
+    ['name' => 'Venue Reservation', 'category' => 'Facility Request', 'type' => 'organization'],
     ['name' => 'Clearance Form', 'category' => 'Student Service', 'type' => 'student'],
 ];
