@@ -9,10 +9,15 @@
 <section class="dashboard-welcome">
     <img src="<?= url('assets/images/cvsu_logo.png') ?>" alt="CVSU CEIT logo" class="dashboard-logo">
     <div>
-        <p class="dashboard-brand-name">CVSU - CEIT</p>
         <p class="dashboard-greeting">Welcome, <strong><?= e($user['name']) ?></strong></p>
         <p class="dashboard-meta">
             <?= e($user['student_number']) ?> &middot; <?= e($user['course']) ?>
+        </p>
+        <p class="dashboard-meta">
+            <?= e($user['organization']) ?> &middot; <?= e($user['organization_role']) ?>
+        </p>
+        <p class="dashboard-meta dashboard-capstone">
+            Capstone: <?= e($user['capstone_title']) ?>
         </p>
     </div>
 </section>
@@ -47,7 +52,10 @@
 
             <?php foreach ($recentRequests as $request): ?>
                 <div class="request-row" role="row">
-                    <span role="cell"><?= e($request['document']) ?></span>
+                    <span role="cell">
+                        <span class="request-document"><?= e($request['document']) ?></span>
+                        <span class="request-category"><?= e($request['category']) ?></span>
+                    </span>
                     <span role="cell"><?= e($request['date']) ?></span>
                     <span role="cell">
                         <span class="status status-<?= e($request['status']) ?>">

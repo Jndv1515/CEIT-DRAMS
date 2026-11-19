@@ -408,6 +408,10 @@ main.container {
     font-size: 0.8125rem;
 }
 
+.dashboard-capstone {
+    color: #fdba74;
+}
+
 .stat-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
@@ -488,6 +492,18 @@ main.container {
 
 .request-row:last-child {
     border-bottom: 0;
+}
+
+.request-document {
+    display: block;
+    font-weight: 500;
+}
+
+.request-category {
+    display: block;
+    margin-top: 0.1rem;
+    color: var(--muted);
+    font-size: 0.75rem;
 }
 
 .request-head {
