@@ -22,6 +22,6 @@
         <?php require __DIR__ . '/footer.php'; ?>
     <?php endif; ?>
 
-    <script src="<?= url('assets/js/app.js') ?>"></script>
+    <script src="<?= url('assets/js/app.js') ?>?v=<?= filemtime(BASE_PATH . '/assets/js/app.js') ?>"></script>
 </body>
 </html>

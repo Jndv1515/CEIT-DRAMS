@@ -40,6 +40,6 @@ $isCurrent = static fn (string $key): string => $activeNav === $key ? ' aria-cur
         </div>
     </div>
 
-    <script src="<?= url('assets/js/app.js') ?>"></script>
+    <script src="<?= url('assets/js/app.js') ?>?v=<?= filemtime(BASE_PATH . '/assets/js/app.js') ?>"></script>
 </body>
 </html>

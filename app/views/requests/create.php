@@ -36,6 +36,17 @@
             <input type="file" id="attachment" name="attachment"
                    accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
             <p class="file-hint">PDF, DOC, DOCX, PNG, JPG, or JPEG &middot; Max 5 MB</p>
+
+            <div class="file-preview" id="attachment-preview" aria-live="polite" hidden>
+                <div class="file-preview-head">
+                    <div>
+                        <strong id="attachment-preview-title"></strong>
+                        <span class="file-preview-meta" id="attachment-preview-meta"></span>
+                    </div>
+                    <button type="button" class="file-preview-clear" id="attachment-preview-clear">Remove</button>
+                </div>
+                <div class="file-preview-body" id="attachment-preview-body"></div>
+            </div>
         </div>
 
         <div class="form-actions">
