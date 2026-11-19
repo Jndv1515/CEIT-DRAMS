@@ -66,6 +66,8 @@ ceit-drams/
 - Colors match the reference's dark theme: dark zinc gradient, light text, white "Log in" button with dark text. Dark is the default regardless of the OS setting.
 - Google sign-in is intentionally omitted; the email/password form is shown directly.
 - Login and registration screens share `layouts/auth.php` and the same dark theme, with links to each other.
+- Both auth screens use a two-column layout adapted from the target mockup: form on the left, branding and tagline on the right, stacking on narrow screens.
+- The dashboard uses an orange palette: orange gradient header, orange buttons, and an orange hero accent.
 - `login.php` is kept only so existing links keep working; it redirects to `/login`.
 - `index.css` is a stub; the real stylesheet is `assets/css/style.css`.
 - Authentication and the database layer are intentionally left unimplemented.

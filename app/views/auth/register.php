@@ -1,14 +1,25 @@
 <div class="auth-shell">
-    <div class="auth-panel">
-        <a class="auth-brand" href="<?= url('/') ?>">
-            <span class="auth-logo-wrap">
-                <img src="<?= url('assets/images/cvsu_logo.png') ?>" alt="App Logo" class="auth-logo">
-            </span>
-            <span class="sr-only">CvSU Feedback</span>
-        </a>
+    <div class="auth-layout">
+        <section class="auth-brand-panel">
+            <a class="auth-brand" href="<?= url('/') ?>">
+                <span class="auth-logo-wrap">
+                    <img src="<?= url('assets/images/cvsu_logo.png') ?>" alt="App Logo" class="auth-logo">
+                </span>
+                <span class="sr-only">CvSU Feedback</span>
+            </a>
 
-        <div class="auth-stack">
-            <div class="auth-badge">CEIT Document Request and Approval Management System</div>
+            <p class="auth-brand-name">CVSU - CEIT</p>
+            <h2 class="auth-brand-title">Document Request and Approval Management System</h2>
+            <p class="auth-tagline">Request. Track. Approve.</p>
+        </section>
+
+        <section class="auth-form-panel">
+            <div class="auth-tabs">
+                <a href="<?= url('/login') ?>">Login</a>
+                <span class="active">Registration</span>
+            </div>
+
+            <h1 class="auth-title">Create account</h1>
 
             <!-- TODO: Registration is not wired up yet; this is the UI scaffold. -->
             <form method="post" action="<?= url('/register') ?>" class="auth-form" id="register-form">
@@ -19,9 +30,9 @@
                 </div>
 
                 <div class="field">
-                    <label for="email">Email address</label>
-                    <input type="email" id="email" name="email" placeholder="Email address"
-                           autocomplete="email" required>
+                    <label for="email">Email / Student No.</label>
+                    <input type="text" id="email" name="email" placeholder="Email / Student No."
+                           autocomplete="username" required>
                 </div>
 
                 <div class="field">
@@ -40,8 +51,8 @@
             </form>
 
             <p class="auth-switch">
-                Already have an account? <a href="<?= url('/login') ?>">Log in</a>
+                Already have an account? <a href="<?= url('/login') ?>">Login here</a>
             </p>
-        </div>
+        </section>
     </div>
 </div>
