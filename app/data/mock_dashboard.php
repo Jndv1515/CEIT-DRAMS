@@ -39,14 +39,14 @@ return [
 
     'recentRequests' => [
         [
-            'document' => 'Thesis Proposal Approval',
+            'document' => 'Capstone Proposal Approval',
             'category' => 'Capstone · Individual',
             'type' => 'student',
             'date' => 'Nov 18, 2026',
             'status' => 'pending',
         ],
         [
-            'document' => 'Activity Proposal — CEIT Week',
+            'document' => 'Activity Proposal',
             'category' => 'Student Organization',
             'type' => 'organization',
             'date' => 'Nov 17, 2026',

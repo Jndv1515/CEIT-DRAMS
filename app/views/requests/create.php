@@ -8,16 +8,12 @@
 
 <section class="card request-card">
     <form method="post" action="<?= url('/request') ?>" class="request-form">
-        <input type="hidden" name="context" value="<?= e($context) ?>">
-
         <div class="field">
             <label for="document">Document Type <span class="required">*</span></label>
             <select id="document" name="document" required>
                 <option value="">Select Document Type</option>
                 <?php foreach ($documents as $document): ?>
-                    <option value="<?= e($document['name']) ?>">
-                        <?= e($document['name']) ?> &mdash; <?= e($document['category']) ?>
-                    </option>
+                    <option value="<?= e($document['name']) ?>"><?= e($document['name']) ?></option>
                 <?php endforeach; ?>
             </select>
         </div>

@@ -9,22 +9,15 @@ final class RequestController extends Controller
 {
     public function create(): void
     {
-        $context = $_GET['context'] ?? 'personal';
-        $context = in_array($context, ['personal', 'organization'], true) ? $context : 'personal';
-
         $this->view('requests/create', [
             'title' => 'Request a Document',
             'activeNav' => 'request',
-            'context' => $context,
             'documents' => require APP_PATH . '/data/documents.php',
         ], 'layouts/dashboard');
     }
 
     public function store(): void
     {
-        $context = $_POST['context'] ?? 'personal';
-        $context = in_array($context, ['personal', 'organization'], true) ? $context : 'personal';
-
         $documentName = trim((string) ($_POST['document'] ?? ''));
         $purpose = trim((string) ($_POST['purpose'] ?? ''));
         $notes = trim((string) ($_POST['notes'] ?? ''));
@@ -41,10 +34,11 @@ final class RequestController extends Controller
 
         if ($selected === null || $purpose === '') {
             set_flash('Please choose a document and enter the purpose.');
-            $this->redirect('/request?context=' . rawurlencode($context));
+            $this->redirect('/request');
         }
 
-        $type = $context === 'organization' ? 'organization' : 'student';
+        // The selected document is the source of truth for the requester type.
+        $type = $selected['type'];
         $count = count(submitted_requests()) + 1;
 
         store_request([
@@ -59,7 +53,9 @@ final class RequestController extends Controller
         ]);
 
         set_flash('Request submitted. It now appears in your recent requests.');
-        $this->redirect('/dashboard?context=' . rawurlencode($context));
+        $this->redirect($type === 'organization'
+            ? '/dashboard?context=organization&filter=organization'
+            : '/dashboard?context=personal&filter=all');
     }
 
     public function index(): void
