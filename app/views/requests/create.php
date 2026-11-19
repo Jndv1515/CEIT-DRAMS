@@ -13,7 +13,10 @@
             <select id="document" name="document" required>
                 <option value="">Select Document Type</option>
                 <?php foreach ($documents as $document): ?>
-                    <option value="<?= e($document['name']) ?>"><?= e($document['name']) ?></option>
+                    <option value="<?= e($document['name']) ?>"
+                        <?= $selectedDocument === $document['name'] ? 'selected' : '' ?>>
+                        <?= e($document['name']) ?>
+                    </option>
                 <?php endforeach; ?>
             </select>
         </div>

@@ -29,12 +29,12 @@ ceit-drams/
 │   ├── views/
 │   │   ├── auth/login.php      # CvSU-style email/password login UI
 │   │   ├── auth/register.php   # Matching registration UI
-│   │   ├── documents/index.php # /documents
 │   │   ├── errors/404.php
 │   │   ├── home/index.php      # /dashboard content
 │   │   ├── layouts/            # main.php, auth.php, dashboard.php, header.php, footer.php
 │   │   ├── requests/create.php # /request form
-│   │   └── requests/index.php  # /requests
+│   │   ├── requests/index.php  # /requests tabs: requests + available documents
+│   │   └── requests/show.php   # /request-details
 │   └── helpers.php             # url(), e(), flash + request session helpers
 ├── assets/
 │   ├── css/style.css           # Login + dashboard styles (dark by default)
@@ -68,8 +68,9 @@ ceit-drams/
 | `/register`  | Registration screen (same style)              |
 | `/dashboard` | Centralized request dashboard                 |
 | `/request`   | GET: request form; POST: submit a request     |
-| `/requests`  | Submitted and sample requests                 |
-| `/documents` | Available document types                      |
+| `/requests`  | Tabs: My Requests + Available Documents       |
+| `/request-details` | Details for one submitted request      |
+| `/documents` | Redirects to `/requests?view=documents`       |
 | `/attachment`| Streams a session request's uploaded file     |
 | `/logout`    | Redirects back to `/login`                    |
 
@@ -83,6 +84,7 @@ ceit-drams/
 - The dashboard is centralized for student and organization requests: a Personal / Organization context switcher, request-type filters, and requester badges share one queue. It keeps the responsive sidebar, clickable stat cards, and labeled mobile rows in the dark/orange theme.
 - Dashboard content comes from `app/data/mock_dashboard.php`; swap it for database queries when the backend is ready. Sample scenarios cover capstone/thesis and student organization document requests.
 - The Document Forward Request module is frontend-only: `/request` validates and stores submissions in `$_SESSION`, redirects with a flash message, and the new Pending request appears at the top of Recent Requests and My Requests. Document types come from `app/data/documents.php`; the requester type is derived from the selected document, not from the dashboard context.
+- Tracking and the document catalog are consolidated in `/requests` with My Requests / Available Documents tabs. Both tables include an Actions column: View (request details) and Download (attachment) on My Requests, and Request on Available Documents. `/documents` redirects to the catalog tab, and each Request action pre-fills `/request?document=<name>`.
 - Optional supporting files (PDF, DOC, DOCX, PNG, JPG, JPEG; max 5 MB) are moved to `storage/uploads/` and served through `/attachment?request=<id>`. The uploads directory is blocked from direct web access; swap this for database-backed storage when the backend is ready.
 - `login.php` is kept only so existing links keep working; it redirects to `/login`.
 - `index.css` is a stub; the real stylesheet is `assets/css/style.css`.

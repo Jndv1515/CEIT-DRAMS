@@ -21,10 +21,22 @@ final class RequestController extends Controller
 
     public function create(): void
     {
+        $documents = require APP_PATH . '/data/documents.php';
+        $selected = trim((string) ($_GET['document'] ?? ''));
+        $valid = false;
+
+        foreach ($documents as $document) {
+            if ($document['name'] === $selected) {
+                $valid = true;
+                break;
+            }
+        }
+
         $this->view('requests/create', [
             'title' => 'Request a Document',
             'activeNav' => 'request',
-            'documents' => require APP_PATH . '/data/documents.php',
+            'documents' => $documents,
+            'selectedDocument' => $valid ? $selected : '',
         ], 'layouts/dashboard');
     }
 
@@ -71,22 +83,49 @@ final class RequestController extends Controller
 
     public function index(): void
     {
+        $view = $_GET['view'] ?? 'requests';
+        $view = in_array($view, ['requests', 'documents'], true) ? $view : 'requests';
+
         $mockData = require APP_PATH . '/data/mock_dashboard.php';
 
         $this->view('requests/index', [
             'title' => 'My Requests',
             'activeNav' => 'requests',
+            'activeView' => $view,
             'requests' => array_merge(submitted_requests(), $mockData['recentRequests']),
+            'documents' => require APP_PATH . '/data/documents.php',
+        ], 'layouts/dashboard');
+    }
+
+    public function show(): void
+    {
+        $id = (string) ($_GET['id'] ?? '');
+        $mockData = require APP_PATH . '/data/mock_dashboard.php';
+        $request = null;
+
+        foreach (array_merge(submitted_requests(), $mockData['recentRequests']) as $item) {
+            if (($item['id'] ?? '') === $id) {
+                $request = $item;
+                break;
+            }
+        }
+
+        if ($request === null) {
+            http_response_code(404);
+            require VIEWS_PATH . '/errors/404.php';
+            return;
+        }
+
+        $this->view('requests/show', [
+            'title' => 'Request Details',
+            'activeNav' => 'requests',
+            'request' => $request,
         ], 'layouts/dashboard');
     }
 
     public function documents(): void
     {
-        $this->view('documents/index', [
-            'title' => 'My Documents',
-            'activeNav' => 'documents',
-            'documents' => require APP_PATH . '/data/documents.php',
-        ], 'layouts/dashboard');
+        $this->redirect('/requests?view=documents');
     }
 
     /**

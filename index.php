@@ -27,6 +27,7 @@ $router->get('/dashboard', [HomeController::class, 'index']);
 $router->get('/request', [RequestController::class, 'create']);
 $router->post('/request', [RequestController::class, 'store']);
 $router->get('/requests', [RequestController::class, 'index']);
+$router->get('/request-details', [RequestController::class, 'show']);
 $router->get('/documents', [RequestController::class, 'documents']);
 $router->get('/attachment', [RequestController::class, 'attachment']);
 

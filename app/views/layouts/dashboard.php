@@ -24,7 +24,6 @@ $isCurrent = static fn (string $key): string => $activeNav === $key ? ' aria-cur
                 <a class="<?= $isActive('dashboard') ?>" href="<?= url('/dashboard') ?>"<?= $isCurrent('dashboard') ?>>Dashboard</a>
                 <a class="<?= $isActive('request') ?>" href="<?= url('/request') ?>"<?= $isCurrent('request') ?>>Request Document</a>
                 <a class="<?= $isActive('requests') ?>" href="<?= url('/requests') ?>"<?= $isCurrent('requests') ?>>My Requests</a>
-                <a class="<?= $isActive('documents') ?>" href="<?= url('/documents') ?>"<?= $isCurrent('documents') ?>>My Documents</a>
                 <a class="<?= $isActive('profile') ?>" href="<?= url('/dashboard') ?>"<?= $isCurrent('profile') ?>>Profile</a>
             </nav>
 

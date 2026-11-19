@@ -38,6 +38,7 @@ return [
 
     'recentRequests' => [
         [
+            'id' => 'DR-20261118-0001',
             'document' => 'Thesis Proposal',
             'category' => 'Thesis · Individual',
             'type' => 'student',
@@ -45,6 +46,7 @@ return [
             'status' => 'pending',
         ],
         [
+            'id' => 'DR-20261115-0002',
             'document' => 'Event Proposal',
             'category' => 'Student Organization',
             'type' => 'organization',
@@ -52,6 +54,7 @@ return [
             'status' => 'approved',
         ],
         [
+            'id' => 'DR-20261110-0003',
             'document' => 'Clearance Form',
             'category' => 'Student Service',
             'type' => 'student',
