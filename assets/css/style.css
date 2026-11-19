@@ -520,6 +520,7 @@ main.container {
 .dashboard-greeting {
     margin: 0;
     font-size: 1.125rem;
+    font-weight: 600;
 }
 
 .dashboard-greeting strong {
@@ -530,10 +531,6 @@ main.container {
     margin: 0.15rem 0 0;
     color: var(--muted);
     font-size: 0.8125rem;
-}
-
-.dashboard-capstone {
-    color: #fdba74;
 }
 
 .stat-grid {
