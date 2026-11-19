@@ -4,16 +4,16 @@ declare(strict_types=1);
 /**
  * Temporary dashboard data. Replace with database-backed queries later.
  * Scenarios cover both individual students (thesis/capstone) and
- * student organization requests.
+ * student organization requests in one centralized queue.
  */
 return [
     'user' => [
         'name' => 'Keith Montenegro',
         'student_number' => '2021-00432',
-        'course' => 'BS Information Technology',
+        'course' => 'BS Computer Science',
         'organization' => 'CEIT Student Council',
-        'organization_role' => 'Senator for Operations and Implementation',
-        'capstone_title' => 'Smart Attendance Monitoring System',
+        'organization_role' => 'Events Coordinator',
+        'capstone_title' => 'Document Request and Approval Management System',
     ],
 
     'stats' => [
@@ -41,30 +41,35 @@ return [
         [
             'document' => 'Thesis Proposal Approval',
             'category' => 'Capstone · Individual',
+            'type' => 'student',
             'date' => 'Nov 18, 2026',
             'status' => 'pending',
         ],
         [
             'document' => 'Activity Proposal — CEIT Week',
             'category' => 'Student Organization',
+            'type' => 'organization',
             'date' => 'Nov 17, 2026',
             'status' => 'approved',
         ],
         [
             'document' => 'Capstone Title Change Request',
             'category' => 'Capstone · Individual',
+            'type' => 'student',
             'date' => 'Nov 14, 2026',
             'status' => 'pending',
         ],
         [
             'document' => 'Venue Reservation Form',
             'category' => 'Student Organization',
+            'type' => 'organization',
             'date' => 'Nov 10, 2026',
             'status' => 'approved',
         ],
         [
             'document' => 'Certificate of Enrollment',
             'category' => 'Student Service',
+            'type' => 'student',
             'date' => 'Nov 06, 2026',
             'status' => 'pending',
         ],

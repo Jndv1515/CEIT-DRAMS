@@ -6,10 +6,14 @@
         </a>
 
         <nav class="sidebar-nav" aria-label="Dashboard sections">
-            <a class="active" href="<?= url('/dashboard') ?>" aria-current="page">Overview</a>
-            <a href="<?= url('/dashboard') ?>">Requests</a>
-            <a href="<?= url('/dashboard') ?>">Documents</a>
-            <a href="<?= url('/dashboard') ?>">Organizations</a>
+            <a class="<?= ($context === 'personal' && $filter === 'all') ? 'active' : '' ?>"
+               href="<?= url('/dashboard') ?>?context=personal&amp;filter=all"
+               <?= ($context === 'personal' && $filter === 'all') ? 'aria-current="page"' : '' ?>>Overview</a>
+            <a href="<?= url('/dashboard') ?>?context=<?= e($context) ?>&amp;filter=all">Requests</a>
+            <a href="<?= url('/dashboard') ?>?context=<?= e($context) ?>&amp;filter=student">Documents</a>
+            <a class="<?= $context === 'organization' ? 'active' : '' ?>"
+               href="<?= url('/dashboard') ?>?context=organization&amp;filter=organization"
+               <?= $context === 'organization' ? 'aria-current="page"' : '' ?>>Organizations</a>
             <a href="<?= url('/dashboard') ?>">Profile</a>
         </nav>
 
@@ -20,24 +24,42 @@
         <section class="dashboard-header">
             <div>
                 <p class="dashboard-eyebrow">CVSU - CEIT</p>
-                <h1 class="dashboard-title">Student Dashboard</h1>
+                <h1 class="dashboard-title">Document Requests Dashboard</h1>
+            </div>
+
+            <div class="context-switcher" role="group" aria-label="Dashboard context">
+                <a class="context-btn <?= $context === 'personal' ? 'active' : '' ?>"
+                   href="<?= url('/dashboard') ?>?context=personal&amp;filter=all"
+                   <?= $context === 'personal' ? 'aria-pressed="true"' : '' ?>>Personal</a>
+                <a class="context-btn <?= $context === 'organization' ? 'active' : '' ?>"
+                   href="<?= url('/dashboard') ?>?context=organization&amp;filter=organization"
+                   <?= $context === 'organization' ? 'aria-pressed="true"' : '' ?>>CEIT Student Council</a>
             </div>
         </section>
 
         <section class="dashboard-welcome">
             <img src="<?= url('assets/images/cvsu_logo.png') ?>" alt="CVSU CEIT logo" class="dashboard-logo">
             <div>
-                <p class="dashboard-brand-name">CVSU - CEIT</p>
-                <p class="dashboard-greeting">Welcome, <strong><?= e($user['name']) ?></strong></p>
-                <p class="dashboard-meta">
-                    <?= e($user['student_number']) ?> &middot; <?= e($user['course']) ?>
-                </p>
-                <p class="dashboard-meta">
-                    <?= e($user['organization']) ?> &middot; <?= e($user['organization_role']) ?>
-                </p>
-                <p class="dashboard-meta dashboard-capstone">
-                    Capstone: <?= e($user['capstone_title']) ?>
-                </p>
+                <?php if ($context === 'organization'): ?>
+                    <p class="dashboard-brand-name">Student Organization</p>
+                    <p class="dashboard-greeting">Welcome, <strong><?= e($user['organization']) ?></strong></p>
+                    <p class="dashboard-meta">
+                        <?= e($user['organization_role']) ?> &middot; <?= e($user['course']) ?>
+                    </p>
+                    <p class="dashboard-meta">Representative: <?= e($user['name']) ?></p>
+                <?php else: ?>
+                    <p class="dashboard-brand-name">CVSU - CEIT</p>
+                    <p class="dashboard-greeting">Welcome, <strong><?= e($user['name']) ?></strong></p>
+                    <p class="dashboard-meta">
+                        <?= e($user['student_number']) ?> &middot; <?= e($user['course']) ?>
+                    </p>
+                    <p class="dashboard-meta">
+                        <?= e($user['organization']) ?> &middot; <?= e($user['organization_role']) ?>
+                    </p>
+                    <p class="dashboard-meta dashboard-capstone">
+                        Capstone: <?= e($user['capstone_title']) ?>
+                    </p>
+                <?php endif; ?>
             </div>
         </section>
 
@@ -64,6 +86,15 @@
                     <a class="card-link" href="<?= url('/dashboard') ?>">View All</a>
                 </div>
 
+                <div class="filter-chips" role="group" aria-label="Filter requests">
+                    <a class="chip <?= $filter === 'all' ? 'active' : '' ?>"
+                       href="<?= url('/dashboard') ?>?context=<?= e($context) ?>&amp;filter=all">All</a>
+                    <a class="chip <?= $filter === 'student' ? 'active' : '' ?>"
+                       href="<?= url('/dashboard') ?>?context=<?= e($context) ?>&amp;filter=student">Student</a>
+                    <a class="chip <?= $filter === 'organization' ? 'active' : '' ?>"
+                       href="<?= url('/dashboard') ?>?context=<?= e($context) ?>&amp;filter=organization">Organization</a>
+                </div>
+
                 <div class="request-table" role="table" aria-label="Recent document requests">
                     <div class="request-row request-head" role="row">
                         <span role="columnheader">Document</span>
@@ -76,6 +107,9 @@
                             <span role="cell" data-label="Document">
                                 <span class="request-document"><?= e($request['document']) ?></span>
                                 <span class="request-category"><?= e($request['category']) ?></span>
+                                <span class="requester-badge requester-badge-<?= e($request['type']) ?>">
+                                    <?= e(ucfirst($request['type'])) ?>
+                                </span>
                             </span>
                             <span role="cell" data-label="Date Requested"><?= e($request['date']) ?></span>
                             <span role="cell" data-label="Status">

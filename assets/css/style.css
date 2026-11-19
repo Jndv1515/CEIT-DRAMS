@@ -456,6 +456,10 @@ main.container {
 }
 
 .dashboard-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
     padding-bottom: 1.25rem;
     margin-bottom: 1.5rem;
     border-bottom: 1px solid var(--border);
@@ -474,6 +478,34 @@ main.container {
     margin: 0;
     font-size: clamp(1.5rem, 4vw, 2.25rem);
     line-height: 1.2;
+}
+
+.context-switcher {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 0;
+    overflow: hidden;
+}
+
+.context-btn {
+    padding: 0.5rem 0.85rem;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.context-btn + .context-btn {
+    border-left: 1px solid var(--border);
+}
+
+.context-btn:hover {
+    color: var(--text);
+}
+
+.context-btn.active {
+    background: var(--primary);
+    color: #fff;
 }
 
 .dashboard-welcome {
@@ -620,6 +652,32 @@ main.container {
     text-decoration: underline;
 }
 
+.filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.chip {
+    padding: 0.3rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 0;
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.chip:hover {
+    color: var(--text);
+}
+
+.chip.active {
+    border-color: var(--primary-light);
+    background: rgba(234, 88, 12, 0.14);
+    color: #fdba74;
+}
+
 .request-table {
     border: 1px solid var(--border);
     border-radius: 0.5rem;
@@ -651,6 +709,29 @@ main.container {
     font-size: 0.75rem;
 }
 
+.requester-badge {
+    display: inline-block;
+    margin-top: 0.35rem;
+    padding: 0.1rem 0.4rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--muted);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.requester-badge-student {
+    border-color: rgba(234, 88, 12, 0.45);
+    color: #fdba74;
+}
+
+.requester-badge-organization {
+    border-color: rgba(148, 163, 184, 0.5);
+    color: #cbd5e1;
+}
+
 .request-head {
     background: rgba(255, 255, 255, 0.04);
     color: var(--muted);
@@ -679,6 +760,11 @@ main.container {
 }
 
 @media (max-width: 48rem) {
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
     .dashboard-grid {
         grid-template-columns: 1fr;
     }
