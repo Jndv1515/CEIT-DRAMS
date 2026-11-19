@@ -31,16 +31,19 @@ ceit-drams/
 │   │   ├── auth/login.php      # CvSU-style email/password login UI
 │   │   ├── auth/register.php   # Matching registration UI
 │   │   ├── admin/index.php     # /admin staff queue
+│   │   ├── components/         # Shared fragments (e.g. decision-actions.php)
 │   │   ├── errors/404.php
 │   │   ├── home/index.php      # /dashboard content
 │   │   ├── layouts/            # main.php, auth.php, dashboard.php, admin.php, header.php, footer.php
 │   │   ├── requests/create.php # /request form
-│   │   ├── requests/index.php  # /requests tabs: requests + available documents
+│   │   ├── requests/index.php  # /requests tabs: requests + document catalog cards
 │   │   └── requests/show.php   # /request-details
 │   └── helpers.php             # url(), e(), flash + request session helpers
 ├── assets/
 │   ├── css/style.css           # Login + dashboard styles (dark by default)
 │   ├── js/app.js               # Frontend file preview for request uploads
+│   ├── js/admin.js             # Staff decision confirmation dialog
+│   ├── js/documents.js         # Document catalog preview dialog
 │   └── images/cvsu_logo.png
 ├── storage/
 │   ├── logs/                   # Runtime logs
@@ -74,8 +77,8 @@ ceit-drams/
 | `/request`   | GET: request form; POST: submit a request     |
 | `/requests`  | Tabs: My Requests + Available Documents       |
 | `/request-details` | Details for one submitted request      |
-| `/documents` | Redirects to `/requests?view=documents`       |
-| `/attachment`| Streams a session request's uploaded file     |
+| `/documents` | Document catalog: cards, filters, preview      |
+| `/attachment`| Streams a session request's uploaded file; `?inline=1` renders it in the preview dialog |
 | `/logout`    | Redirects back to `/login`                    |
 
 ## Notes
@@ -88,8 +91,10 @@ ceit-drams/
 - The dashboard is centralized for student and organization requests: a Personal / Organization context switcher, request-type filters, and requester badges share one queue. It keeps the responsive sidebar, clickable stat cards, and labeled mobile rows in the dark/orange theme.
 - Dashboard content comes from `app/data/mock_dashboard.php`; swap it for database queries when the backend is ready. Sample scenarios cover capstone/thesis and student organization document requests.
 - The Document Forward Request module is frontend-only: `/request` validates and stores submissions in `$_SESSION`, redirects with a flash message, and the new Pending request appears at the top of Recent Requests and My Requests. Document types come from `app/data/documents.php`; the requester type is derived from the selected document, not from the dashboard context.
-- Tracking and the document catalog are consolidated in `/requests` with My Requests / Available Documents tabs. Both tables include an Actions column: View (request details) and Download (attachment) on My Requests, and Request on Available Documents. `/documents` redirects to the catalog tab, and each Request action pre-fills `/request?document=<name>`.
-- The request form includes a frontend-only attachment preview using the browser File API: PDF, PNG, JPG, and JPEG render inline before submission; DOC/DOCX show a fallback message. Submitted requests still use the Download action because `/attachment` streams files as downloads.
+- Tracking and the document catalog are consolidated under `/requests` with My Requests / Available Documents tabs; `/documents` opens the catalog directly. My Requests stays a table with View (request details) and Download (attachment) actions, plus an empty state when there are no requests.
+- The catalog is a searchable set of document cards with requester-type and availability filters and name/category sorting. Availability (Available to download, Request pending, Request again, Request required) is derived from the current session's request statuses; each card shows format, size, and eligibility. Cards link to Request, Track/View request, or Download/Preview depending on state, and a "Showing X of Y documents" count plus an empty state cover filtered results.
+- Previewable attachments (PDF, PNG, JPG, JPEG) open in a keyboard-accessible dialog driven by `assets/js/documents.js`: focus moves to the close button on open and returns to the Preview button on close. `/attachment?request=<id>&inline=1` serves the file inline for the dialog, while the plain `/attachment?request=<id>` link still downloads it.
+- The request form includes a frontend-only attachment preview using the browser File API: PDF, PNG, JPG, and JPEG render inline before submission; DOC/DOCX show a fallback message.
 - A frontend-only admin/staff dashboard lives at `/admin`. It shares the same request queue, adds Pending / Approved / Forwarded / Rejected filters, and lets staff Approve, Forward, Reject, or Reset requests. Status changes are stored in `$_SESSION['request_statuses']` and are reflected on the requester dashboard, My Requests, and request details. Since authentication is still mocked, `/admin` is a demo entry point rather than a permission-gated area.
 - Optional supporting files (PDF, DOC, DOCX, PNG, JPG, JPEG; max 5 MB) are moved to `storage/uploads/` and served through `/attachment?request=<id>`. The uploads directory is blocked from direct web access; swap this for database-backed storage when the backend is ready.
 - `login.php` is kept only so existing links keep working; it redirects to `/login`.

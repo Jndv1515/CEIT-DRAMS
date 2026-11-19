@@ -83,15 +83,149 @@ final class RequestController extends Controller
 
     public function index(): void
     {
-        $view = $_GET['view'] ?? 'requests';
+        $view = (string) ($_GET['view'] ?? 'requests');
         $view = in_array($view, ['requests', 'documents'], true) ? $view : 'requests';
+        $this->renderTracker($view);
+    }
+
+    /**
+     * Build the enriched catalog with access state derived from the queue.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function catalogDocuments(): array
+    {
+        $documents = require APP_PATH . '/data/documents.php';
+        $requests = queue_requests();
+        $catalog = [];
+
+        foreach ($documents as $document) {
+            $matching = array_values(array_filter(
+                $requests,
+                static fn (array $request): bool => ($request['document'] ?? '') === $document['name']
+            ));
+
+            $approved = null;
+            $pending = null;
+            $rejected = null;
+
+            foreach ($matching as $request) {
+                $status = (string) ($request['status'] ?? 'pending');
+
+                if ($status === 'approved' && $approved === null) {
+                    $approved = $request;
+                } elseif (in_array($status, ['pending', 'processing'], true) && $pending === null) {
+                    $pending = $request;
+                } elseif ($status === 'rejected' && $rejected === null) {
+                    $rejected = $request;
+                }
+            }
+
+            if ($approved !== null) {
+                $state = 'available';
+                $stateLabel = 'Available to download';
+            } elseif ($pending !== null) {
+                $state = 'pending';
+                $stateLabel = 'Request pending';
+            } elseif ($rejected !== null) {
+                $state = 'rejected';
+                $stateLabel = 'Request again';
+            } else {
+                $state = 'required';
+                $stateLabel = 'Request required';
+            }
+
+            $chosen = $approved ?? $pending ?? $rejected;
+            $hasAttachment = $chosen !== null && !empty($chosen['attachment_name']);
+            $extension = $hasAttachment
+                ? strtolower((string) pathinfo((string) $chosen['attachment_name'], PATHINFO_EXTENSION))
+                : '';
+
+            $catalog[] = array_merge($document, [
+                'state' => $state,
+                'stateLabel' => $stateLabel,
+                'stateClass' => $state === 'rejected' ? 'pending' : ($state === 'required' ? 'restricted' : $state),
+                'requestId' => (string) ($chosen['id'] ?? ''),
+                'attachmentName' => (string) ($chosen['attachment_name'] ?? ''),
+                'hasAttachment' => $hasAttachment,
+                'previewable' => $hasAttachment && in_array($extension, ['pdf', 'png', 'jpg', 'jpeg'], true),
+            ]);
+        }
+
+        return $catalog;
+    }
+
+    private function renderTracker(string $view): void
+    {
+        $allDocuments = $this->catalogDocuments();
+        $catalog = $allDocuments;
+        $search = '';
+        $typeFilter = 'all';
+        $accessFilter = 'all';
+        $sort = 'name-asc';
+
+        if ($view === 'documents') {
+            $search = trim((string) ($_GET['q'] ?? ''));
+            $typeFilter = (string) ($_GET['type'] ?? 'all');
+            $accessFilter = (string) ($_GET['access'] ?? 'all');
+            $sort = (string) ($_GET['sort'] ?? 'name-asc');
+
+            $typeFilter = in_array($typeFilter, ['all', 'student', 'organization'], true) ? $typeFilter : 'all';
+            $accessFilter = in_array($accessFilter, ['all', 'available', 'pending', 'rejected', 'required'], true)
+                ? $accessFilter
+                : 'all';
+            $sort = in_array($sort, ['name-asc', 'category-asc'], true) ? $sort : 'name-asc';
+
+            if ($search !== '') {
+                $catalog = array_values(array_filter(
+                    $catalog,
+                    static function (array $document) use ($search): bool {
+                        foreach (['name', 'category', 'description', 'eligibility'] as $field) {
+                            if (stripos((string) ($document[$field] ?? ''), $search) !== false) {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
+                ));
+            }
+
+            if ($typeFilter !== 'all') {
+                $catalog = array_values(array_filter(
+                    $catalog,
+                    static fn (array $document): bool => ($document['type'] ?? '') === $typeFilter
+                ));
+            }
+
+            if ($accessFilter !== 'all') {
+                $catalog = array_values(array_filter(
+                    $catalog,
+                    static fn (array $document): bool => ($document['state'] ?? '') === $accessFilter
+                ));
+            }
+
+            usort($catalog, static function (array $a, array $b) use ($sort): int {
+                if ($sort === 'category-asc') {
+                    return strcasecmp((string) ($a['category'] ?? ''), (string) ($b['category'] ?? ''))
+                        ?: strcasecmp((string) ($a['name'] ?? ''), (string) ($b['name'] ?? ''));
+                }
+
+                return strcasecmp((string) ($a['name'] ?? ''), (string) ($b['name'] ?? ''));
+            });
+        }
 
         $this->view('requests/index', [
-            'title' => 'My Requests',
+            'title' => $view === 'documents' ? 'Available Documents' : 'My Requests',
             'activeNav' => $view === 'documents' ? 'documents' : 'requests',
             'activeView' => $view,
             'requests' => queue_requests(),
-            'documents' => require APP_PATH . '/data/documents.php',
+            'documents' => $catalog,
+            'totalDocuments' => count($allDocuments),
+            'search' => $search,
+            'typeFilter' => $typeFilter,
+            'accessFilter' => $accessFilter,
+            'sort' => $sort,
         ], 'layouts/dashboard');
     }
 
@@ -119,7 +253,7 @@ final class RequestController extends Controller
 
     public function documents(): void
     {
-        $this->redirect('/requests?view=documents');
+        $this->renderTracker('documents');
     }
 
     /**
@@ -141,9 +275,10 @@ final class RequestController extends Controller
 
             $name = (string) ($request['attachment_name'] ?? 'attachment');
             $type = (string) ($request['attachment_type'] ?? 'application/octet-stream');
+            $disposition = ($_GET['inline'] ?? '') === '1' ? 'inline' : 'attachment';
 
             header('Content-Type: ' . $type);
-            header('Content-Disposition: attachment; filename="' . addcslashes($name, "\"\\") . '"');
+            header('Content-Disposition: ' . $disposition . '; filename="' . addcslashes($name, "\"\\") . '"');
             header('Content-Length: ' . (string) filesize($path));
             header('X-Content-Type-Options: nosniff');
             readfile($path);
