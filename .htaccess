@@ -1,0 +1,11 @@
+# Prevent directory listings
+Options -Indexes
+
+# Block direct access to application and storage files
+RewriteRule ^(app|storage)(/|$) - [F,L]
+
+# Send non-file requests to the front controller
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
