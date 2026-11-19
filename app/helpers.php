@@ -32,6 +32,46 @@ if (!function_exists('e')) {
     }
 }
 
+if (!function_exists('set_flash')) {
+    function set_flash(string $message): void
+    {
+        $_SESSION['flash'] = $message;
+    }
+}
+
+if (!function_exists('take_flash')) {
+    function take_flash(): ?string
+    {
+        $message = $_SESSION['flash'] ?? null;
+        unset($_SESSION['flash']);
+        return $message;
+    }
+}
+
+if (!function_exists('submitted_requests')) {
+    /**
+     * @return array<int, array<string, string>>
+     */
+    function submitted_requests(): array
+    {
+        return $_SESSION['document_requests'] ?? [];
+    }
+}
+
+if (!function_exists('store_request')) {
+    /**
+     * @param array<string, string> $request
+     */
+    function store_request(array $request): void
+    {
+        if (!isset($_SESSION['document_requests']) || !is_array($_SESSION['document_requests'])) {
+            $_SESSION['document_requests'] = [];
+        }
+
+        array_unshift($_SESSION['document_requests'], $request);
+    }
+}
+
 if (!function_exists('icon')) {
     /**
      * Return a small inline SVG icon. Unknown names fall back to a document.

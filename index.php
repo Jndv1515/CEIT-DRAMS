@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use App\Controllers\AuthController;
 use App\Controllers\HomeController;
+use App\Controllers\RequestController;
 use App\Core\Router;
 
 require __DIR__ . '/app/config/config.php';
@@ -22,5 +23,10 @@ $router->get('/logout', [AuthController::class, 'logout']);
 
 // Placeholder destination after authentication is implemented.
 $router->get('/dashboard', [HomeController::class, 'index']);
+
+$router->get('/request', [RequestController::class, 'create']);
+$router->post('/request', [RequestController::class, 'store']);
+$router->get('/requests', [RequestController::class, 'index']);
+$router->get('/documents', [RequestController::class, 'documents']);
 
 $router->dispatch();

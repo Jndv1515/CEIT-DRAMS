@@ -17,6 +17,11 @@ final class HomeController extends Controller
         $context = in_array($context, ['personal', 'organization'], true) ? $context : 'personal';
         $filter = in_array($filter, ['all', 'student', 'organization'], true) ? $filter : 'all';
 
+        $mockData['recentRequests'] = array_merge(
+            submitted_requests(),
+            $mockData['recentRequests']
+        );
+
         if ($filter !== 'all') {
             $mockData['recentRequests'] = array_values(array_filter(
                 $mockData['recentRequests'],
@@ -26,9 +31,9 @@ final class HomeController extends Controller
 
         $this->view('home/index', array_merge([
             'title' => 'Dashboard',
-            'showSiteChrome' => false,
+            'activeNav' => 'dashboard',
             'context' => $context,
             'filter' => $filter,
-        ], $mockData));
+        ], $mockData), 'layouts/dashboard');
     }
 }
