@@ -515,15 +515,6 @@ main.container {
     height: auto;
 }
 
-.dashboard-brand-name {
-    margin: 0 0 0.15rem;
-    color: var(--muted);
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-}
-
 .dashboard-greeting {
     margin: 0;
     font-size: 1.125rem;
