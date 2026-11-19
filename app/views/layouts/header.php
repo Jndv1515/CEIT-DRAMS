@@ -3,8 +3,8 @@
         <a class="brand" href="<?= url('/') ?>">CEIT <span>DRAMS</span></a>
 
         <nav class="site-nav">
-            <a href="<?= url('/') ?>">Home</a>
-            <a href="<?= url('/login') ?>">Login</a>
+            <a href="<?= url('/dashboard') ?>">Dashboard</a>
+            <a href="<?= url('/logout') ?>">Logout</a>
         </nav>
     </div>
 </header>
