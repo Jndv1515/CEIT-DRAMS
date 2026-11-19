@@ -10,16 +10,30 @@ return [
     'user' => [
         'name' => 'Keith Montenegro',
         'student_number' => '2021-00432',
-        'course' => 'BS Computer Science',
+        'course' => 'BS Information Technology',
         'organization' => 'CEIT Student Council',
-        'organization_role' => 'Events Coordinator',
-        'capstone_title' => 'Document Request and Approval Management System',
+        'organization_role' => 'Senator for Operations and Implementation',
     ],
 
     'stats' => [
-        ['label' => 'Pending Requests', 'value' => '04'],
-        ['label' => 'Approved', 'value' => '09'],
-        ['label' => 'Available Documents', 'value' => '06'],
+        [
+            'label' => 'Pending Requests',
+            'value' => '04',
+            'icon' => '◷',
+            'trend' => '+2 this week',
+        ],
+        [
+            'label' => 'Approved',
+            'value' => '09',
+            'icon' => '✓',
+            'trend' => '+3 this month',
+        ],
+        [
+            'label' => 'Available Documents',
+            'value' => '06',
+            'icon' => '▤',
+            'trend' => '2 new forms',
+        ],
     ],
 
     'recentRequests' => [

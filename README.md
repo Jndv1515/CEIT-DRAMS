@@ -67,7 +67,7 @@ ceit-drams/
 - Google sign-in is intentionally omitted; the email/password form is shown directly.
 - Login and registration screens share `layouts/auth.php` and the same dark theme, with links to each other.
 - Both auth screens use a two-column layout adapted from the target mockup: form on the left, branding and tagline on the right, stacking on narrow screens.
-- The dashboard follows the target mockup structure: welcome block, three stat cards, quick actions, and a recent requests table, all in the dark/orange theme.
+- The dashboard follows the target mockup structure with a responsive sidebar, clickable stat cards, quick actions, and request rows that keep their labels on mobile, all in the dark/orange theme.
 - Dashboard content comes from `app/data/mock_dashboard.php`; swap it for database queries when the backend is ready. Sample scenarios cover capstone/thesis and student organization document requests.
 - `login.php` is kept only so existing links keep working; it redirects to `/login`.
 - `index.css` is a stub; the real stylesheet is `assets/css/style.css`.

@@ -343,11 +343,119 @@ main.container {
     min-height: 60vh;
 }
 
-.dashboard-header {
+.dashboard-shell {
+    display: grid;
+    grid-template-columns: 14rem minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.dashboard-sidebar {
+    position: sticky;
+    top: 1.5rem;
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--text);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.sidebar-logo {
+    width: 2.25rem;
+    height: auto;
+}
+
+.sidebar-brand strong {
+    color: var(--primary-light);
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.sidebar-nav a {
+    padding: 0.55rem 0.75rem;
+    border-radius: 0.5rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.sidebar-nav a:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+}
+
+.sidebar-nav a.active {
+    background: rgba(234, 88, 12, 0.14);
+    box-shadow: inset 3px 0 0 var(--primary-light);
+    color: #fdba74;
+    font-weight: 600;
+}
+
+.sidebar-logout {
+    margin-top: auto;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: center;
+    text-decoration: none;
+}
+
+.sidebar-logout:hover {
+    border-color: var(--primary-light);
+    color: var(--text);
+}
+
+@media (max-width: 62rem) {
+    .dashboard-shell {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .dashboard-sidebar {
+        position: static;
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+        overflow-x: auto;
+    }
+
+    .sidebar-brand {
+        display: none;
+    }
+
+    .sidebar-nav {
+        flex: 1;
+        flex-direction: row;
+    }
+
+    .sidebar-nav a {
+        white-space: nowrap;
+    }
+
+    .sidebar-logout {
+        flex-shrink: 0;
+        margin-top: 0;
+    }
+}
+
+.dashboard-header {
     padding-bottom: 1.25rem;
     margin-bottom: 1.5rem;
     border-bottom: 1px solid var(--border);
@@ -420,12 +528,38 @@ main.container {
 }
 
 .stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    color: inherit;
     text-align: center;
+    text-decoration: none;
     border-top: 3px solid var(--primary-light);
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(234, 88, 12, 0.45);
+    box-shadow: 0 14px 32px rgba(194, 65, 12, 0.18);
+}
+
+.stat-icon {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-bottom: 0.15rem;
+    border-radius: 999px;
+    background: rgba(234, 88, 12, 0.14);
+    color: #fdba74;
+    font-size: 1rem;
+    font-weight: 700;
 }
 
 .stat-value {
-    margin: 0;
+    display: block;
     color: var(--primary-light);
     font-size: 2rem;
     font-weight: 700;
@@ -433,10 +567,17 @@ main.container {
 }
 
 .stat-label {
-    margin: 0.35rem 0 0;
+    display: block;
     color: var(--muted);
     font-size: 0.875rem;
     font-weight: 500;
+}
+
+.stat-trend {
+    display: block;
+    margin-top: 0.15rem;
+    color: var(--muted);
+    font-size: 0.75rem;
 }
 
 .dashboard-grid {
@@ -538,13 +679,22 @@ main.container {
         grid-template-columns: 1fr;
     }
 
-    .request-row {
-        grid-template-columns: 1fr;
-        gap: 0.25rem;
-    }
-
     .request-head {
         display: none;
+    }
+
+    .request-row {
+        grid-template-columns: 1fr;
+        gap: 0.35rem;
+    }
+
+    .request-row [role="cell"]::before {
+        content: attr(data-label) ": ";
+        color: var(--muted);
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
     }
 }
 
