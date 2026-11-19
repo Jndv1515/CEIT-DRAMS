@@ -10,7 +10,7 @@ $isCurrent = static fn (string $key): string => $activeNav === $key ? ' aria-cur
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($title ?? 'CEIT DRAMS') ?></title>
-    <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>">
+    <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= filemtime(BASE_PATH . '/assets/css/style.css') ?>">
 </head>
 <body>
     <div class="dashboard-shell">
