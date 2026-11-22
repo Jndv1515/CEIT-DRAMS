@@ -4,10 +4,13 @@
 <button type="button"
         class="theme-toggle"
         data-theme-toggle
-        aria-label="Switch to light mode">
+        aria-label="Switch to dark mode">
     <span class="theme-toggle-icon" aria-hidden="true">
         <span class="theme-icon theme-icon-sun"><?= icon('sun') ?></span>
         <span class="theme-icon theme-icon-moon"><?= icon('moon') ?></span>
     </span>
-    <span class="theme-toggle-label">Light</span>
+    <span class="theme-toggle-label" aria-hidden="true">
+        <span class="theme-destination-dark">Dark</span>
+        <span class="theme-destination-light">Light</span>
+    </span>
 </button>

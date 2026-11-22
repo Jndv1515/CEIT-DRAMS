@@ -7,24 +7,17 @@
     var root = document.documentElement;
 
     function apply(theme) {
-        var isLight = theme === 'light';
-        var destination = isLight ? 'Dark' : 'Light';
-        var action = isLight ? 'Switch to dark mode' : 'Switch to light mode';
+        var action = theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
 
         root.setAttribute('data-theme', theme);
 
-        // The short label and icon show the destination; the accessible name stays explicit.
+        // The visible label and icon are driven by CSS, so they never flash on load.
         document.querySelectorAll('[data-theme-toggle]').forEach(function (button) {
             button.setAttribute('aria-label', action);
-
-            var label = button.querySelector('.theme-toggle-label');
-            if (label) {
-                label.textContent = destination;
-            }
         });
     }
 
-    apply(root.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
+    apply(root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light');
 
     document.querySelectorAll('[data-theme-toggle]').forEach(function (button) {
         button.addEventListener('click', function () {

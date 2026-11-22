@@ -42,7 +42,7 @@ ceit-drams/
 │   │   └── requests/show.php   # /request-details
 │   └── helpers.php             # url(), e(), flash + request session helpers
 ├── assets/
-│   ├── css/style.css           # Login + dashboard styles (dark by default, light via tokens)
+│   ├── css/style.css           # Login + dashboard styles (light by default, dark via tokens)
 │   ├── js/app.js               # Frontend file preview for request uploads
 │   ├── js/admin.js             # Staff decision confirmation dialog
 │   ├── js/documents.js         # Document catalog preview dialog
@@ -88,10 +88,10 @@ ceit-drams/
 ## Notes
 
 - The login layout uses `app/views/layouts/auth.php` (no site header/footer), matching the reference.
-- Colors match the reference's dark theme: dark zinc gradient, light text, white "Log in" button with dark text. Dark is the default regardless of the OS setting.
+- The palette matches the reference (dark zinc gradient, light text, white "Log in" button with dark text) as the optional dark theme. Light is the default for new visitors, regardless of the OS setting; a saved choice in `localStorage` always wins.
 - A light/dark toggle sits in the sidebar utility area above Logout on dashboard/admin pages, and as a compact top-right icon button on auth pages. Its short label and icon describe the destination ("Light" with a sun in dark mode; "Dark" with a moon in light mode), while the accessible name stays explicit ("Switch to light mode" / "Switch to dark mode"). The choice is stored in `localStorage` and applied before the stylesheet loads to avoid a flash. Themes are token-only overrides under `[data-theme="light"]`, so components need no theme-specific code.
 - Google sign-in is intentionally omitted; the email/password form is shown directly.
-- Login and registration screens share `layouts/auth.php` and the same dark theme, with links to each other.
+- Login and registration screens share `layouts/auth.php` and the same theme, with links to each other.
 - Both auth screens use a two-column layout adapted from the target mockup: form on the left, branding and tagline on the right, stacking on narrow screens.
 - The dashboard is centralized for student and organization requests: a Personal / Organization context switcher, request-type filters, and requester badges share one queue. It keeps the responsive sidebar, clickable stat cards, and labeled mobile rows in the dark/orange theme.
 - Dashboard content comes from `app/data/mock_dashboard.php`; swap it for database queries when the backend is ready. Sample scenarios cover capstone/thesis and student organization document requests.

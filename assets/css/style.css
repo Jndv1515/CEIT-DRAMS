@@ -568,6 +568,19 @@ main.container {
     flex: 1;
 }
 
+/* Keep the visible label and icon in sync without waiting for JS. */
+.theme-destination-light {
+    display: none;
+}
+
+[data-theme="dark"] .theme-destination-dark {
+    display: none;
+}
+
+[data-theme="dark"] .theme-destination-light {
+    display: inline;
+}
+
 /* The icon shows the destination: sun in dark mode, moon in light mode. */
 .theme-icon-moon {
     display: none;
