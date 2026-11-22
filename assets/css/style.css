@@ -530,7 +530,7 @@ main.container {
     margin-top: auto;
 }
 
-.theme-switch {
+.theme-toggle {
     display: flex;
     align-items: center;
     gap: 0.6rem;
@@ -545,12 +545,12 @@ main.container {
     cursor: pointer;
 }
 
-.theme-switch:hover {
+.theme-toggle:hover {
     background: var(--surface-hover);
     color: var(--text);
 }
 
-.theme-switch-icon {
+.theme-toggle-icon {
     display: grid;
     place-items: center;
     width: 1rem;
@@ -558,55 +558,26 @@ main.container {
     flex-shrink: 0;
 }
 
-.theme-switch-icon svg,
+.theme-toggle-icon svg,
 .theme-icon-button svg {
     width: 1rem;
     height: 1rem;
 }
 
-.theme-switch-label {
+.theme-toggle-label {
     flex: 1;
 }
 
-.theme-switch-track {
-    position: relative;
-    width: 2rem;
-    height: 1.1rem;
-    flex-shrink: 0;
-    border-radius: 999px;
-    background: var(--border-strong);
-    transition: background-color 0.15s ease;
-}
-
-.theme-switch-thumb {
-    position: absolute;
-    top: 0.15rem;
-    left: 0.15rem;
-    width: 0.8rem;
-    height: 0.8rem;
-    border-radius: 999px;
-    background: var(--text);
-    transition: transform 0.15s ease;
-}
-
-[data-theme="light"] .theme-switch-track {
-    background: var(--primary);
-}
-
-[data-theme="light"] .theme-switch-thumb {
-    transform: translateX(0.9rem);
-    background: #fff;
-}
-
-.theme-icon-sun {
-    display: none;
-}
-
-[data-theme="light"] .theme-icon-moon {
+/* The icon shows the destination: sun in dark mode, moon in light mode. */
+.theme-icon-moon {
     display: none;
 }
 
 [data-theme="light"] .theme-icon-sun {
+    display: none;
+}
+
+[data-theme="light"] .theme-icon-moon {
     display: block;
 }
 
@@ -688,11 +659,11 @@ main.container {
         margin-top: 0;
     }
 
-    .theme-switch {
+    .theme-toggle {
         width: auto;
     }
 
-    .theme-switch-label {
+    .theme-toggle-label {
         display: none;
     }
 }

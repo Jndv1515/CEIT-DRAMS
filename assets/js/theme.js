@@ -8,16 +8,17 @@
 
     function apply(theme) {
         var isLight = theme === 'light';
+        var action = isLight ? 'Switch to dark mode' : 'Switch to light mode';
+
         root.setAttribute('data-theme', theme);
 
+        // Text and icons describe the destination, so they always match what a click does.
         document.querySelectorAll('[data-theme-toggle]').forEach(function (button) {
-            if (button.getAttribute('data-theme-toggle') === 'switch') {
-                button.setAttribute('aria-checked', isLight ? 'true' : 'false');
-            } else {
-                button.setAttribute(
-                    'aria-label',
-                    isLight ? 'Switch to dark mode' : 'Switch to light mode'
-                );
+            button.setAttribute('aria-label', action);
+
+            var label = button.querySelector('.theme-toggle-label');
+            if (label) {
+                label.textContent = action;
             }
         });
     }

@@ -36,7 +36,7 @@ ceit-drams/
 │   │   ├── home/index.php      # /dashboard content
 │   │   ├── home/profile.php    # /profile account details
 │   │   ├── layouts/            # main.php, auth.php, dashboard.php, admin.php, header.php, footer.php
-│   │   │   └── partials/       # Shared theme head/switch/icon fragments
+│   │   │   └── partials/       # Shared theme head/toggle/icon fragments
 │   │   ├── requests/create.php # /request form
 │   │   ├── requests/index.php  # /requests tabs: requests + document catalog cards
 │   │   └── requests/show.php   # /request-details
@@ -89,7 +89,7 @@ ceit-drams/
 
 - The login layout uses `app/views/layouts/auth.php` (no site header/footer), matching the reference.
 - Colors match the reference's dark theme: dark zinc gradient, light text, white "Log in" button with dark text. Dark is the default regardless of the OS setting.
-- A light/dark switch sits in the sidebar utility area above Logout on dashboard/admin pages, and as a compact top-right icon button on auth pages. The choice is stored in `localStorage` and applied before the stylesheet loads to avoid a flash. Themes are token-only overrides under `[data-theme="light"]`, so components need no theme-specific code.
+- A light/dark toggle sits in the sidebar utility area above Logout on dashboard/admin pages, and as a compact top-right icon button on auth pages. Its text and icon describe the destination ("Switch to light mode" with a sun in dark mode; "Switch to dark mode" with a moon in light mode), so the label always matches what a click does. The choice is stored in `localStorage` and applied before the stylesheet loads to avoid a flash. Themes are token-only overrides under `[data-theme="light"]`, so components need no theme-specific code.
 - Google sign-in is intentionally omitted; the email/password form is shown directly.
 - Login and registration screens share `layouts/auth.php` and the same dark theme, with links to each other.
 - Both auth screens use a two-column layout adapted from the target mockup: form on the left, branding and tagline on the right, stacking on narrow screens.
