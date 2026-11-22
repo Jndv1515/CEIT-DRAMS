@@ -1,11 +1,14 @@
-# CEIT — Document Request and Approval Management System (DRAMS)
+# CEIT DRAMS: Document Request and Approval Management System
+
+A PHP application for requesting, tracking, and approving CEIT documents. Requests and status changes live in the current PHP session; there is no database or credential validation yet.
 
 ## Run locally
 
-1. Start **Apache** in XAMPP.
-2. Open <http://localhost/ceit-drams/>.
-3. Make sure Apache's `mod_rewrite` is enabled (it is by default in XAMPP) so routes
-   such as `/login` work.
+1. `git clone https://github.com/s0nprem0/ceit-drams C:/xampp/htdocs/ceit-drams`
+2. Start **Apache** in XAMPP.
+3. Open <http://localhost/ceit-drams/>. The router strips the `/ceit-drams` prefix, so generated links work from the subdirectory.
+4. Apache must load `mod_rewrite` and allow `.htaccess` overrides (`AllowOverride All`). The rules in `.htaccess` send non-file requests to `index.php` and block direct access to `app/` and `storage/`.
+5. `fiveserver.config.js` points Five Server at `C:\xampp\php\php.exe`. Edit that path if PHP is installed elsewhere.
 
 ## Structure
 
@@ -24,85 +27,103 @@ ceit-drams/
 │   │   ├── Router.php          # GET/POST route table and dispatch
 │   │   └── View.php            # View rendering with layout
 │   ├── data/
-│   │   ├── mock_dashboard.php  # Sample dashboard/request records
+│   │   ├── mock_dashboard.php  # Sample dashboard user, stats, and requests
 │   │   └── documents.php       # Available document types
-│   ├── models/                 # Model classes go here (future database layer)
+│   ├── models/                 # App\Models\ autoloads from here
 │   ├── views/
-│   │   ├── auth/login.php      # CvSU-style email/password login UI
-│   │   ├── auth/register.php   # Matching registration UI
+│   │   ├── auth/login.php      # CvSU-branded email/password login UI
+│   │   ├── auth/register.php   # Registration UI
 │   │   ├── admin/index.php     # /admin staff queue
 │   │   ├── components/         # Shared fragments (e.g. decision-actions.php)
 │   │   ├── errors/404.php
 │   │   ├── home/index.php      # /dashboard content
 │   │   ├── home/profile.php    # /profile account details
 │   │   ├── layouts/            # main.php, auth.php, dashboard.php, admin.php, header.php, footer.php
-│   │   │   └── partials/       # Shared theme head/toggle/icon fragments
+│   │   │   └── partials/       # theme-head.php, theme-icon.php, theme-sidebar.php
 │   │   ├── requests/create.php # /request form
 │   │   ├── requests/index.php  # /requests tabs: requests + document catalog cards
 │   │   └── requests/show.php   # /request-details
-│   └── helpers.php             # url(), e(), flash + request session helpers
+│   └── helpers.php             # url(), e(), set_flash(), take_flash(), request helpers
 ├── assets/
-│   ├── css/style.css           # Login + dashboard styles (light by default, dark via tokens)
-│   ├── js/app.js               # Frontend file preview for request uploads
+│   ├── css/style.css           # Theme tokens and component styles
+│   ├── js/app.js               # Tabs keyboard support and request upload preview
 │   ├── js/admin.js             # Staff decision confirmation dialog
 │   ├── js/documents.js         # Document catalog preview dialog
 │   ├── js/theme.js             # Light/dark toggle persistence
 │   └── images/cvsu_logo.png
 ├── storage/
-│   ├── logs/                   # Runtime logs
-│   └── uploads/                # Request attachments (not web-accessible)
+│   ├── logs/                   # Directory reserved for runtime logs
+│   └── uploads/                # Request attachments (blocked from direct web access)
 ├── .htaccess                   # Rewrite rules + access restrictions
-├── index.php                   # Front controller — all routes enter here
-├── login.php                   # Legacy redirect to /login
+├── index.php                   # Front controller; all routes enter here
+├── login.php                   # 301 redirect to /login
 └── fiveserver.config.js        # Five Server PHP path
 ```
 
 ## Adding a page
 
-1. Add a method to a controller in `app/controllers/`, e.g. `RequestsController::index()`.
-2. Register the route in `index.php`:
+1. Add a method to a controller in `app/controllers/`. For example, `/requests` is handled by `RequestController::index()` in `app/controllers/RequestController.php`.
+2. Register the route in `index.php`, with the matching `use App\Controllers\RequestController;` import:
    ```php
-   $router->get('/requests', [RequestsController::class, 'index']);
+   $router->get('/requests', [RequestController::class, 'index']);
    ```
-3. Create `app/views/requests/index.php` and call
-   `$this->view('requests/index', ['title' => 'Requests'])` from the controller.
+3. Create the view under `app/views/` and pass its path to `view()`. Pass the layout explicitly to use the dashboard sidebar:
+   ```php
+   $this->view('requests/index', ['title' => 'Requests'], 'layouts/dashboard');
+   ```
+   `view()` uses `layouts/main` when no layout argument is given.
 
 ## Routes
 
-| Route        | Displays                                      |
-| ------------ | --------------------------------------------- |
-| `/`          | Login screen (default display)                |
-| `/login`     | Same login screen                             |
-| `/register`  | Registration screen (same style)              |
-| `/dashboard` | Centralized request dashboard                 |
-| `/profile`   | Account details and request activity          |
-| `/admin`     | Admin/staff queue with status filters         |
-| `/admin/action` | POST: approve, reject, forward, or reset   |
-| `/request`   | GET: request form; POST: submit a request     |
-| `/requests`  | Tabs: My Requests + Available Documents       |
-| `/request-details` | Details for one submitted request      |
-| `/documents` | Document catalog: cards, filters, preview      |
-| `/attachment`| Streams a session request's uploaded file; `?inline=1` renders it in the preview dialog |
-| `/logout`    | Redirects back to `/login`                    |
+| Route              | Displays                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| `/`                | Login screen (default display)                                                        |
+| `/login`           | Login screen; POST redirects to `/dashboard`                                          |
+| `/register`        | Registration screen; POST redirects to `/login`                                       |
+| `/dashboard`       | Request dashboard                                                                     |
+| `/profile`         | Account details and request activity                                                  |
+| `/admin`           | Staff queue with status filters                                                       |
+| `/admin/action`    | POST: approve, forward, reject, or reset a request                                    |
+| `/request`         | GET: request form; POST: submit a request                                             |
+| `/requests`        | Tabs: My Requests + Available Documents                                               |
+| `/request-details` | Details for one request; expects `?id=<id>`                                           |
+| `/documents`       | Document catalog: cards, filters, preview                                             |
+| `/attachment`      | Streams `?request=<id>`; `&inline=1` serves the file inline instead of downloading it |
+| `/logout`          | Redirects to `/login`                                                                 |
 
-## Notes
+## How it works
 
-- The login layout uses `app/views/layouts/auth.php` (no site header/footer), matching the reference.
-- The palette matches the reference (dark zinc gradient, light text, white "Log in" button with dark text) as the optional dark theme. Light is the default for new visitors, regardless of the OS setting; a saved choice in `localStorage` always wins.
-- A light/dark toggle sits in the sidebar utility area above Logout on dashboard/admin pages, and as a compact top-right icon button on auth pages. Its short label and icon describe the destination ("Light" with a sun in dark mode; "Dark" with a moon in light mode), while the accessible name stays explicit ("Switch to light mode" / "Switch to dark mode"). The choice is stored in `localStorage` and applied before the stylesheet loads to avoid a flash. Themes are token-only overrides under `[data-theme="light"]`, so components need no theme-specific code.
-- Google sign-in is intentionally omitted; the email/password form is shown directly.
-- Login and registration screens share `layouts/auth.php` and the same theme, with links to each other.
-- Both auth screens use a two-column layout adapted from the target mockup: form on the left, branding and tagline on the right, stacking on narrow screens.
-- The dashboard is centralized for student and organization requests: a Personal / Organization context switcher, request-type filters, and requester badges share one queue. It keeps the responsive sidebar, clickable stat cards, and labeled mobile rows in the dark/orange theme.
-- Dashboard content comes from `app/data/mock_dashboard.php`; swap it for database queries when the backend is ready. Sample scenarios cover capstone/thesis and student organization document requests.
-- The Document Forward Request module is frontend-only: `/request` validates and stores submissions in `$_SESSION`, redirects with a flash message, and the new Pending request appears at the top of Recent Requests and My Requests. Document types come from `app/data/documents.php`; the requester type is derived from the selected document, not from the dashboard context.
-- Tracking and the document catalog are consolidated under `/requests` with My Requests / Available Documents tabs; `/documents` opens the catalog directly. My Requests stays a table with View (request details) and Download (attachment) actions, plus an empty state when there are no requests.
-- The catalog is a searchable set of document cards with requester-type and availability filters and name/category sorting. Availability (Available to download, Request pending, Request again, Request required) is derived from the current session's request statuses; each card shows format, size, and eligibility. Cards link to Request, Track/View request, or Download/Preview depending on state, and a "Showing X of Y documents" count plus an empty state cover filtered results.
-- Previewable attachments (PDF, PNG, JPG, JPEG) open in a keyboard-accessible dialog driven by `assets/js/documents.js`: focus moves to the close button on open and returns to the Preview button on close. `/attachment?request=<id>&inline=1` serves the file inline for the dialog, while the plain `/attachment?request=<id>` link still downloads it.
-- The request form includes a frontend-only attachment preview using the browser File API: PDF, PNG, JPG, and JPEG render inline before submission; DOC/DOCX show a fallback message.
-- A frontend-only admin/staff dashboard lives at `/admin`. It shares the same request queue, adds Pending / Approved / Forwarded / Rejected filters, and lets staff Approve, Forward, Reject, or Reset requests. Status changes are stored in `$_SESSION['request_statuses']` and are reflected on the requester dashboard, My Requests, and request details. Since authentication is still mocked, `/admin` is a demo entry point rather than a permission-gated area.
-- Optional supporting files (PDF, DOC, DOCX, PNG, JPG, JPEG; max 5 MB) are moved to `storage/uploads/` and served through `/attachment?request=<id>`. The uploads directory is blocked from direct web access; swap this for database-backed storage when the backend is ready.
-- `/profile` shows the demo user's personal information and request activity from `app/data/mock_dashboard.php` and the session queue. The sidebar Profile link now opens this page; editing is deferred until authentication and the database layer are implemented.
-- `login.php` is kept only so existing links keep working; it redirects to `/login`.
-- `index.css` is a stub; the real stylesheet is `assets/css/style.css`.
-- Authentication and the database layer are intentionally left unimplemented.
+- `/` and `/login` render `auth/login.php`; `/register` renders `auth/register.php`. Both use `layouts/auth.php`, which omits the site header and footer. The views use email/password fields and link to each other. There is no Google sign-in option.
+- The auth grid is one column below 48rem and splits into form on the left, branding on the right at 48rem and wider.
+- `/dashboard` reads the demo user, stats, and sample requests from `app/data/mock_dashboard.php`, then prepends requests submitted in the session. It has a Personal / CEIT Student Council context switcher, Student / Organization filters, requester badges, and stat cards that link to `/requests`. Both contexts share one Recent Requests queue.
+- `/request` checks that the document exists in `app/data/documents.php` and that the purpose is non-empty. The requester type comes from the selected document, not from the dashboard context. Submissions get an ID such as `DR-20261122-0001`, are stored in `$_SESSION['document_requests']`, and appear at the top of Recent Requests and My Requests.
+- `/requests` has My Requests and Available Documents tabs; `/documents` opens the catalog tab directly. My Requests is a table with View and Download actions and an empty state. The catalog searches names, categories, descriptions, and eligibility; filters by requester type and availability; and sorts by name or category. Availability labels (Available to download, Request pending, Request again, Request required) come from session request statuses. Filtered results show a "Showing X of Y documents" count and an empty state.
+- `/admin` uses the same queue with `layouts/admin`. Status filters are All, Pending, Processing, Approved, Rejected, and Forwarded, plus search and sort. Pending and processing requests offer Approve, Forward, and Reject; other statuses offer Reset. The dialog in `assets/js/admin.js` requires a rejection reason of at least 10 characters, and the controller rejects an empty reason. Status overrides go to `$_SESSION['request_statuses']` and appear on the dashboard, in My Requests, and on the details page.
+- `/profile` shows the demo user's details from `app/data/mock_dashboard.php` and request activity from the session queue. It is read-only.
+
+## Attachments and previews
+
+- `/request` accepts an optional PDF, DOC, DOCX, PNG, JPG, or JPEG up to 5 MB. The controller checks the extension and MIME type, stores the file in `storage/uploads/` under a generated name, and serves it through `/attachment?request=<id>`. Without `&inline=1`, the response uses `Content-Disposition: attachment`.
+- `assets/js/app.js` previews a selected PDF, PNG, JPG, or JPEG in the form with `URL.createObjectURL`; DOC and DOCX show a fallback message. Server-side checks still run on submit.
+- Catalog previews use `assets/js/documents.js` for PDF, PNG, JPG, and JPEG attachments. The dialog moves focus to its close button on open and back to the Preview button on close. Browsers without native `<dialog>.showModal()` open the attachment URL directly.
+- `storage/uploads/.htaccess` denies direct requests, and the root `.htaccess` blocks `storage/` as well.
+
+## Theming
+
+- `assets/css/style.css` defines tokens in `:root` (zinc surfaces, white accents with dark foreground, orange brand colors) and overrides them under `[data-theme="light"]`. Components use the tokens and need no theme-specific code.
+- Every layout loads `partials/theme-head.php` before the stylesheet. It reads `localStorage['ceit-drams-theme']` and sets `data-theme` to `dark` only for that exact saved value; otherwise it sets `light`. The OS color scheme is not consulted. `assets/js/theme.js` writes the key when the toggle is used.
+- Dashboard and admin layouts place `partials/theme-sidebar.php` above Logout. Its visible label and icon name the destination: "Light" with a sun in dark mode, "Dark" with a moon in light mode. The `aria-label` is "Switch to light mode" or "Switch to dark mode". Auth and `main` layouts use the fixed top-right `partials/theme-icon.php` button instead.
+
+## Current limitations
+
+- There is no authentication or database layer. The `/login` and `/register` POST handlers redirect without checking credentials, and `/admin` has no permission check.
+- Requests, status overrides, and flash messages are stored in `$_SESSION` and are lost when the session ends. The demo user and document list are static arrays in `app/data/`.
+- `login.php` exists only to redirect old `/login.php` links to `/login` with a 301.
+  What changed
+- Fixed the broken example in Adding a page: the class is RequestController, not RequestsController, and view() needs layouts/dashboard passed explicitly.
+- Fixed the clone target to htdocs/ceit-drams; the old command cloned into htdocs itself.
+- Split the 18-bullet Notes wall into How it works, Attachments and previews, Theming, and Current limitations. Kept the run steps, tree, and route table up top.
+- Dropped the vague "matching the reference" / "target mockup" / "when the backend is ready" phrasing. No mockup file exists in the repo, so those comparisons were replaced with the actual CSS tokens and layout files.
+- Removed repeated "frontend-only" labels and the duplicate /admin permission warning; it now appears once under limitations.
+- Reworded the Apache step as a requirement (AllowOverride All) instead of claiming what XAMPP enables by default, and removed the index.css note because that file does not exist.
+- Verified the factual claims against the source: routes, session keys, upload allowlist and 5 MB limit, status filters, theme token names, redirect codes, and dialog focus behavior.
