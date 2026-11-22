@@ -36,15 +36,17 @@ ceit-drams/
 │   │   ├── home/index.php      # /dashboard content
 │   │   ├── home/profile.php    # /profile account details
 │   │   ├── layouts/            # main.php, auth.php, dashboard.php, admin.php, header.php, footer.php
+│   │   │   └── partials/       # Shared theme head/switch/icon fragments
 │   │   ├── requests/create.php # /request form
 │   │   ├── requests/index.php  # /requests tabs: requests + document catalog cards
 │   │   └── requests/show.php   # /request-details
 │   └── helpers.php             # url(), e(), flash + request session helpers
 ├── assets/
-│   ├── css/style.css           # Login + dashboard styles (dark by default)
+│   ├── css/style.css           # Login + dashboard styles (dark by default, light via tokens)
 │   ├── js/app.js               # Frontend file preview for request uploads
 │   ├── js/admin.js             # Staff decision confirmation dialog
 │   ├── js/documents.js         # Document catalog preview dialog
+│   ├── js/theme.js             # Light/dark toggle persistence
 │   └── images/cvsu_logo.png
 ├── storage/
 │   ├── logs/                   # Runtime logs
@@ -87,6 +89,7 @@ ceit-drams/
 
 - The login layout uses `app/views/layouts/auth.php` (no site header/footer), matching the reference.
 - Colors match the reference's dark theme: dark zinc gradient, light text, white "Log in" button with dark text. Dark is the default regardless of the OS setting.
+- A light/dark switch sits in the sidebar utility area above Logout on dashboard/admin pages, and as a compact top-right icon button on auth pages. The choice is stored in `localStorage` and applied before the stylesheet loads to avoid a flash. Themes are token-only overrides under `[data-theme="light"]`, so components need no theme-specific code.
 - Google sign-in is intentionally omitted; the email/password form is shown directly.
 - Login and registration screens share `layouts/auth.php` and the same dark theme, with links to each other.
 - Both auth screens use a two-column layout adapted from the target mockup: form on the left, branding and tagline on the right, stacking on narrow screens.

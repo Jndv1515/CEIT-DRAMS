@@ -12,6 +12,7 @@ $isCurrent = static fn (string $key): string => $activeNav === $key ? ' aria-cur
     <title><?= e($title ?? 'CEIT DRAMS') ?></title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet">
+    <?php require __DIR__ . '/partials/theme-head.php'; ?>
     <link rel="stylesheet" href="<?= url('assets/css/style.css') ?>?v=<?= filemtime(BASE_PATH . '/assets/css/style.css') ?>">
 </head>
 <body>
@@ -30,7 +31,10 @@ $isCurrent = static fn (string $key): string => $activeNav === $key ? ' aria-cur
                 <a class="<?= $isActive('profile') ?>" href="<?= url('/profile') ?>"<?= $isCurrent('profile') ?>>Profile</a>
             </nav>
 
-            <a class="sidebar-logout" href="<?= url('/logout') ?>">Logout</a>
+            <div class="sidebar-utilities">
+                <?php require __DIR__ . '/partials/theme-sidebar.php'; ?>
+                <a class="sidebar-logout" href="<?= url('/logout') ?>">Logout</a>
+            </div>
         </aside>
 
         <div class="dashboard-content">
@@ -46,6 +50,7 @@ $isCurrent = static fn (string $key): string => $activeNav === $key ? ' aria-cur
         </div>
     </div>
 
+    <script src="<?= url('assets/js/theme.js') ?>?v=<?= filemtime(BASE_PATH . '/assets/js/theme.js') ?>"></script>
     <script src="<?= url('assets/js/app.js') ?>?v=<?= filemtime(BASE_PATH . '/assets/js/app.js') ?>"></script>
     <script src="<?= url('assets/js/documents.js') ?>?v=<?= filemtime(BASE_PATH . '/assets/js/documents.js') ?>"></script>
 </body>
