@@ -8,17 +8,18 @@
 
     function apply(theme) {
         var isLight = theme === 'light';
+        var destination = isLight ? 'Dark' : 'Light';
         var action = isLight ? 'Switch to dark mode' : 'Switch to light mode';
 
         root.setAttribute('data-theme', theme);
 
-        // Text and icons describe the destination, so they always match what a click does.
+        // The short label and icon show the destination; the accessible name stays explicit.
         document.querySelectorAll('[data-theme-toggle]').forEach(function (button) {
             button.setAttribute('aria-label', action);
 
             var label = button.querySelector('.theme-toggle-label');
             if (label) {
-                label.textContent = action;
+                label.textContent = destination;
             }
         });
     }
