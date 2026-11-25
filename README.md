@@ -1,14 +1,58 @@
 # CEIT DRAMS: Document Request and Approval Management System
 
-A PHP application for requesting, tracking, and approving CEIT documents. Requests and status changes live in the current PHP session; there is no database or credential validation yet.
+A PHP application for requesting, tracking, and approving CEIT documents. Students can submit document requests with attachments; admin/staff can review, approve, forward, or reject them.
 
-## Run locally
+## Requirements
 
-1. `git clone https://github.com/s0nprem0/ceit-drams C:/xampp/htdocs/ceit-drams`
-2. Start **Apache** in XAMPP.
-3. Open <http://localhost/ceit-drams/>. The router strips the `/ceit-drams` prefix, so generated links work from the subdirectory.
-4. Apache must load `mod_rewrite` and allow `.htaccess` overrides (`AllowOverride All`). The rules in `.htaccess` send non-file requests to `index.php` and block direct access to `app/` and `storage/`.
-5. `fiveserver.config.js` points Five Server at `C:\xampp\php\php.exe`. Edit that path if PHP is installed elsewhere.
+- [XAMPP](https://www.apachefriends.org/) (Apache + MySQL + PHP 8.x)
+- Git
+
+## Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Jndv1515/CEIT-DRAMS C:/xampp/htdocs/DRAMS/ceit-drams
+```
+
+### 2. Create the database
+
+1. Start **Apache** and **MySQL** in the XAMPP Control Panel.
+2. Open **phpMyAdmin** at <http://localhost/phpmyadmin>.
+3. Click **Import** in the top navigation.
+4. Click **Choose File** and select `setup.sql` from the project folder.
+5. Click **Go**. This creates the `ceit_drams` database and both tables (`users` and `document_requests`) automatically.
+
+### 3. Configure your environment
+
+Open the `.env` file in the project root and update the values to match your local XAMPP setup:
+
+```env
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=ceit_drams
+DB_USER=root
+DB_PASS=
+```
+
+The default values work for a standard XAMPP installation (no password on `root`). If you set a MySQL root password, enter it in `DB_PASS`.
+
+### 4. Enable Apache mod_rewrite
+
+1. Open `C:/xampp/apache/conf/httpd.conf` in a text editor.
+2. Find the line `#LoadModule rewrite_module modules/mod_rewrite.so` and remove the `#`.
+3. Find the `<Directory "C:/xampp/htdocs">` block and change `AllowOverride None` to `AllowOverride All`.
+4. Restart Apache in the XAMPP Control Panel.
+
+### 5. Open the app
+
+Go to <http://localhost/DRAMS/ceit-drams/> in your browser. You should see the login screen.
+
+### 6. Create your first account
+
+Click **Register**, fill in your details, and choose your role. After registering, log in with your email and password.
+
+---
 
 ## Structure
 
@@ -114,16 +158,7 @@ ceit-drams/
 - Every layout loads `partials/theme-head.php` before the stylesheet. It reads `localStorage['ceit-drams-theme']` and sets `data-theme` to `dark` only for that exact saved value; otherwise it sets `light`. The OS color scheme is not consulted. `assets/js/theme.js` writes the key when the toggle is used.
 - Dashboard and admin layouts place `partials/theme-sidebar.php` above Logout. Its visible label and icon name the destination: "Light" with a sun in dark mode, "Dark" with a moon in light mode. The `aria-label` is "Switch to light mode" or "Switch to dark mode". Auth and `main` layouts use the fixed top-right `partials/theme-icon.php` button instead.
 
-## Current limitations
+## Notes
 
-- There is no authentication or database layer. The `/login` and `/register` POST handlers redirect without checking credentials, and `/admin` has no permission check.
-- Requests, status overrides, and flash messages are stored in `$_SESSION` and are lost when the session ends. The demo user and document list are static arrays in `app/data/`.
-- `login.php` exists only to redirect old `/login.php` links to `/login` with a 301.
-  What changed
-- Fixed the broken example in Adding a page: the class is RequestController, not RequestsController, and view() needs layouts/dashboard passed explicitly.
-- Fixed the clone target to htdocs/ceit-drams; the old command cloned into htdocs itself.
-- Split the 18-bullet Notes wall into How it works, Attachments and previews, Theming, and Current limitations. Kept the run steps, tree, and route table up top.
-- Dropped the vague "matching the reference" / "target mockup" / "when the backend is ready" phrasing. No mockup file exists in the repo, so those comparisons were replaced with the actual CSS tokens and layout files.
-- Removed repeated "frontend-only" labels and the duplicate /admin permission warning; it now appears once under limitations.
-- Reworded the Apache step as a requirement (AllowOverride All) instead of claiming what XAMPP enables by default, and removed the index.css note because that file does not exist.
-- Verified the factual claims against the source: routes, session keys, upload allowlist and 5 MB limit, status filters, theme token names, redirect codes, and dialog focus behavior.
+- `login.php` at the root exists only to redirect old `/login.php` links to `/login` with a 301.
+- `fiveserver.config.js` points Five Server at `C:\xampp\php\php.exe`. Edit that path if PHP is installed elsewhere.
