@@ -92,9 +92,8 @@ $hasFilters = $statusFilter !== 'all' || $search !== '' || $sort !== 'date-desc'
         <div class="request-table queue-table" role="table" aria-label="Admin request queue">
             <div class="request-row request-head" role="row">
                 <span role="columnheader">Document</span>
-                <span role="columnheader">Category</span>
-                <span role="columnheader">Requester</span>
-                <span role="columnheader">Date Requested</span>
+                <span role="columnheader">Requested By</span>
+                <span role="columnheader">Date</span>
                 <span role="columnheader">Status</span>
                 <span role="columnheader">Actions</span>
             </div>
@@ -105,14 +104,13 @@ $hasFilters = $statusFilter !== 'all' || $search !== '' || $sort !== 'date-desc'
                      data-request-id="<?= e((string) ($request['id'] ?? '')) ?>" tabindex="-1">
                     <span role="cell" data-label="Document">
                         <span class="request-document"><?= e((string) ($request['document'] ?? '')) ?></span>
+                        <span class="request-category"><?= e((string) ($request['category'] ?? '')) ?></span>
                     </span>
-                    <span role="cell" data-label="Category"><?= e((string) ($request['category'] ?? '')) ?></span>
-                    <span role="cell" data-label="Requester">
-                        <span class="requester-badge requester-badge-<?= e((string) ($request['type'] ?? '')) ?>">
-                            <?= e(ucfirst((string) ($request['type'] ?? ''))) ?>
-                        </span>
+                    <span role="cell" data-label="Requested By">
+                        <span class="request-document"><?= e((string) ($request['requester_name'] ?? '')) ?></span>
+                        <span class="request-category"><?= e((string) ($request['requester_number'] ?? '')) ?></span>
                     </span>
-                    <span role="cell" data-label="Date Requested"><?= e((string) ($request['date'] ?? '')) ?></span>
+                    <span role="cell" data-label="Date"><?= e((string) ($request['date'] ?? '')) ?></span>
                     <span role="cell" data-label="Status">
                         <span class="status status-<?= e($status) ?>"><?= e(ucfirst($status)) ?></span>
                     </span>

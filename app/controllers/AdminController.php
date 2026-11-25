@@ -9,6 +9,7 @@ final class AdminController extends Controller
 {
     public function index(): void
     {
+        admin_guard();
         $requests = queue_requests();
         $filter = (string) ($_GET['status'] ?? 'all');
         $allowed = array_merge(['all'], request_statuses());
@@ -81,6 +82,7 @@ final class AdminController extends Controller
 
     public function action(): void
     {
+        admin_guard();
         $id = trim((string) ($_POST['id'] ?? ''));
         $status = trim((string) ($_POST['status'] ?? ''));
         $filter = trim((string) ($_POST['filter'] ?? 'all'));
@@ -110,19 +112,7 @@ final class AdminController extends Controller
             $this->redirect('/admin' . $query);
         }
 
-        update_request_status($id, $status);
-
-        if ($reason !== '') {
-            if (!isset($_SESSION['request_decisions']) || !is_array($_SESSION['request_decisions'])) {
-                $_SESSION['request_decisions'] = [];
-            }
-
-            $_SESSION['request_decisions'][$id] = [
-                'status' => $status,
-                'reason' => $reason,
-                'at' => date('c'),
-            ];
-        }
+        update_request_status($id, $status, $reason);
 
         $_SESSION['focus_request_id'] = $id;
         set_flash('Request ' . $id . ' marked as ' . $status . '.', 'success');

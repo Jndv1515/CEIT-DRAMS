@@ -22,6 +22,9 @@
             <h1 class="auth-title">Create account</h1>
 
             <!-- TODO: Registration is not wired up yet; this is the UI scaffold. -->
+            <?php $flash = take_flash(); if ($flash): ?>
+                <div class="flash flash-<?= e($flash['type']) ?>" role="alert"><?= e($flash['message']) ?></div>
+            <?php endif; ?>
             <form method="post" action="<?= url('/register') ?>" class="auth-form" id="register-form">
                 <div class="field">
                     <label for="name">Full name</label>
@@ -33,6 +36,14 @@
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" placeholder="Email"
                            autocomplete="email" required>
+                </div>
+
+                <div class="field">
+                    <label for="account-type">Account Type</label>
+                    <select id="account-type" name="role" required>
+                        <option value="student">Student</option>
+                        <option value="admin">CEIT Student Council</option>
+                    </select>
                 </div>
 
                 <div class="field">

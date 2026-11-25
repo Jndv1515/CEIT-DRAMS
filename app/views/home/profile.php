@@ -35,7 +35,7 @@ foreach ($requests as $request) {
 <section class="card profile-hero">
     <span class="profile-avatar" aria-hidden="true"><?= e($initials) ?></span>
     <div class="profile-identity">
-        <p class="page-eyebrow">Student account</p>
+        <p class="page-eyebrow"><?= e(ucfirst((string) ($profileUser['role'] ?? 'student'))) ?> account</p>
         <h2 class="profile-name"><?= e($profileName) ?></h2>
         <?php
         $subline = array_filter([
@@ -53,7 +53,7 @@ foreach ($requests as $request) {
 <section class="card profile-details-card">
     <div class="profile-section-head">
         <h2>Personal information</h2>
-        <span class="page-eyebrow">Demo data</span>
+
     </div>
 
     <?php if ($fields === []): ?>

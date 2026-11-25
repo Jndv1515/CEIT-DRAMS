@@ -21,6 +21,10 @@ final class RequestController extends Controller
 
     public function create(): void
     {
+        auth_guard();
+        if ((auth_user()['role'] ?? '') === 'admin') {
+            $this->redirect('/admin');
+        }
         $documents = require APP_PATH . '/data/documents.php';
         $selected = trim((string) ($_GET['document'] ?? ''));
         $valid = false;
@@ -42,6 +46,10 @@ final class RequestController extends Controller
 
     public function store(): void
     {
+        auth_guard();
+        if ((auth_user()['role'] ?? '') === 'admin') {
+            $this->redirect('/admin');
+        }
         $documentName = trim((string) ($_POST['document'] ?? ''));
         $purpose = trim((string) ($_POST['purpose'] ?? ''));
         $notes = trim((string) ($_POST['notes'] ?? ''));
@@ -60,29 +68,41 @@ final class RequestController extends Controller
             $this->fail('Please choose a document and enter the purpose.');
         }
 
-        // The selected document is the source of truth for the requester type.
+        $user = auth_user();
         $type = $selected['type'];
-        $count = count(submitted_requests()) + 1;
+
+        $db = db();
+        $db->beginTransaction();
+        $today = date('Ymd');
+        $seqStmt = $db->prepare(
+            "SELECT COALESCE(MAX(CAST(SUBSTRING_INDEX(id, '-', -1) AS UNSIGNED)), 0) + 1
+             FROM document_requests WHERE id LIKE :prefix FOR UPDATE"
+        );
+        $seqStmt->execute([':prefix' => 'DR-' . $today . '-%']);
+        $seq = (int) $seqStmt->fetchColumn();
 
         store_request(array_merge([
-            'id' => 'DR-' . date('Ymd') . '-' . str_pad((string) $count, 4, '0', STR_PAD_LEFT),
+            'id'       => 'DR-' . $today . '-' . str_pad((string) $seq, 4, '0', STR_PAD_LEFT),
+            'user_id'  => $user['id'],
             'document' => $selected['name'],
             'category' => $selected['category'],
-            'type' => $type,
-            'date' => date('M d, Y'),
-            'status' => 'pending',
-            'purpose' => $purpose,
-            'notes' => $notes,
+            'type'     => $type,
+            'status'   => 'pending',
+            'purpose'  => $purpose,
+            'notes'    => $notes,
         ], $this->handleAttachment()));
+        $db->commit();
 
         set_flash('Request submitted. It now appears in your recent requests.', 'success');
-        $this->redirect($type === 'organization'
-            ? '/dashboard?context=organization&filter=organization'
-            : '/dashboard?context=personal&filter=all');
+        $this->redirect('/dashboard');
     }
 
     public function index(): void
     {
+        auth_guard();
+        if ((auth_user()['role'] ?? '') === 'admin') {
+            $this->redirect('/admin');
+        }
         $view = (string) ($_GET['view'] ?? 'requests');
         $view = in_array($view, ['requests', 'documents'], true) ? $view : 'requests';
         $this->renderTracker($view);
@@ -231,8 +251,16 @@ final class RequestController extends Controller
 
     public function show(): void
     {
-        $id = (string) ($_GET['id'] ?? '');
-        $fromAdmin = ($_GET['from'] ?? '') === 'admin';
+        auth_guard();
+        $id        = (string) ($_GET['id'] ?? '');
+        $isAdmin   = (auth_user()['role'] ?? '') === 'admin';
+        $fromAdmin = $isAdmin && ($_GET['from'] ?? '') === 'admin';
+
+        // Admins can only view via ?from=admin
+        if ($isAdmin && !$fromAdmin) {
+            $this->redirect('/admin');
+        }
+
         $request = find_request($id);
 
         if ($request === null) {
@@ -242,51 +270,53 @@ final class RequestController extends Controller
         }
 
         $this->view('requests/show', [
-            'title' => 'Request Details',
+            'title'     => 'Request Details',
             'activeNav' => $fromAdmin ? 'admin' : 'requests',
             'fromAdmin' => $fromAdmin,
-            'request' => $request,
-            'backUrl' => $fromAdmin ? '/admin' : '/requests',
+            'request'   => $request,
+            'backUrl'   => $fromAdmin ? '/admin' : '/requests',
             'backLabel' => $fromAdmin ? 'Back to Admin' : 'Back to Requests',
         ], $fromAdmin ? 'layouts/admin' : 'layouts/dashboard');
     }
 
     public function documents(): void
     {
+        auth_guard();
+        if ((auth_user()['role'] ?? '') === 'admin') {
+            $this->redirect('/admin');
+        }
         $this->renderTracker('documents');
     }
 
-    /**
-     * Stream a stored attachment for a request in the current session.
-     */
     public function attachment(): void
     {
+        auth_guard();
         $id = (string) ($_GET['request'] ?? '');
+        $request = find_request($id);
 
-        foreach (submitted_requests() as $request) {
-            if (($request['id'] ?? '') !== $id || empty($request['attachment_path'])) {
-                continue;
-            }
-
-            $path = BASE_PATH . '/storage/uploads/' . $request['attachment_path'];
-            if (!is_file($path)) {
-                break;
-            }
-
-            $name = (string) ($request['attachment_name'] ?? 'attachment');
-            $type = (string) ($request['attachment_type'] ?? 'application/octet-stream');
-            $disposition = ($_GET['inline'] ?? '') === '1' ? 'inline' : 'attachment';
-
-            header('Content-Type: ' . $type);
-            header('Content-Disposition: ' . $disposition . '; filename="' . addcslashes($name, "\"\\") . '"');
-            header('Content-Length: ' . (string) filesize($path));
-            header('X-Content-Type-Options: nosniff');
-            readfile($path);
-            exit;
+        if ($request === null || empty($request['attachment_path'])) {
+            http_response_code(404);
+            require VIEWS_PATH . '/errors/404.php';
+            return;
         }
 
-        http_response_code(404);
-        require VIEWS_PATH . '/errors/404.php';
+        $path = BASE_PATH . '/storage/uploads/' . $request['attachment_path'];
+        if (!is_file($path)) {
+            http_response_code(404);
+            require VIEWS_PATH . '/errors/404.php';
+            return;
+        }
+
+        $name = (string) ($request['attachment_name'] ?? 'attachment');
+        $type = (string) ($request['attachment_type'] ?? 'application/octet-stream');
+        $disposition = ($_GET['inline'] ?? '') === '1' ? 'inline' : 'attachment';
+
+        header('Content-Type: ' . $type);
+        header('Content-Disposition: ' . $disposition . '; filename="' . addcslashes($name, '"\\') . '"');
+        header('Content-Length: ' . (string) filesize($path));
+        header('X-Content-Type-Options: nosniff');
+        readfile($path);
+        exit;
     }
 
     /**

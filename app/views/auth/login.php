@@ -22,6 +22,9 @@
             <h1 class="auth-title">Login</h1>
 
             <!-- TODO: Authentication is not wired up yet; this is the UI scaffold. to be wired up by the backend -->
+            <?php $flash = take_flash(); if ($flash): ?>
+                <div class="flash flash-<?= e($flash['type']) ?>" role="alert"><?= e($flash['message']) ?></div>
+            <?php endif; ?>
             <form method="post" action="<?= url('/login') ?>" class="auth-form" id="basic-login-form">
                 <div class="field">
                     <label for="email">Email / Student No.</label>

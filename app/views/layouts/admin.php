@@ -26,7 +26,6 @@ $isCurrent = static fn (string $key): string => $activeNav === $key ? ' aria-cur
             <nav class="sidebar-nav" aria-label="Admin sections">
                 <a class="<?= $isActive('admin') ?>" href="<?= url('/admin') ?>"<?= $isCurrent('admin') ?>>Dashboard</a>
                 <a class="<?= $isActive('queue') ?>" href="<?= url('/admin') ?>?status=pending"<?= $isCurrent('queue') ?>>Pending Queue</a>
-                <a class="<?= $isActive('requester') ?>" href="<?= url('/dashboard') ?>"<?= $isCurrent('requester') ?>>Requester View</a>
             </nav>
 
             <div class="sidebar-utilities">

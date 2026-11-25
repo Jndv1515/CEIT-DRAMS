@@ -29,6 +29,9 @@ $isCurrent = static fn (string $key): string => $activeNav === $key ? ' aria-cur
                 <a class="<?= $isActive('requests') ?>" href="<?= url('/requests') ?>"<?= $isCurrent('requests') ?>>My Requests</a>
                 <a class="<?= $isActive('documents') ?>" href="<?= url('/documents') ?>"<?= $isCurrent('documents') ?>>Available Documents</a>
                 <a class="<?= $isActive('profile') ?>" href="<?= url('/profile') ?>"<?= $isCurrent('profile') ?>>Profile</a>
+                <?php $__u = auth_user(); if (($__u['role'] ?? '') === 'admin'): ?>
+                <a class="<?= $isActive('admin') ?>" href="<?= url('/admin') ?>"<?= $isCurrent('admin') ?>>Admin Panel</a>
+                <?php endif; ?>
             </nav>
 
             <div class="sidebar-utilities">

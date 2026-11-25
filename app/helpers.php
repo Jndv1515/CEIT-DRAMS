@@ -73,111 +73,213 @@ if (!function_exists('take_flash')) {
     }
 }
 
-if (!function_exists('submitted_requests')) {
-    /**
-     * @return array<int, array<string, string>>
-     */
-    function submitted_requests(): array
+if (!function_exists('csrf_token')) {
+    function csrf_token(): string
     {
-        return $_SESSION['document_requests'] ?? [];
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        return $_SESSION['csrf_token'];
     }
 }
 
-if (!function_exists('store_request')) {
-    /**
-     * @param array<string, string> $request
-     */
-    function store_request(array $request): void
+if (!function_exists('csrf_verify')) {
+    function csrf_verify(): void
     {
-        if (!isset($_SESSION['document_requests']) || !is_array($_SESSION['document_requests'])) {
-            $_SESSION['document_requests'] = [];
+        $token = (string) ($_POST['_csrf'] ?? '');
+        if (!hash_equals((string) ($_SESSION['csrf_token'] ?? ''), $token)) {
+            http_response_code(403);
+            exit('Invalid CSRF token.');
         }
-
-        array_unshift($_SESSION['document_requests'], $request);
     }
 }
 
 if (!function_exists('request_statuses')) {
-    /**
-     * @return array<int, string>
-     */
     function request_statuses(): array
     {
         return ['pending', 'processing', 'approved', 'rejected', 'forwarded'];
     }
 }
 
+if (!function_exists('store_request')) {
+    function store_request(array $request): void
+    {
+        $stmt = db()->prepare(
+            'INSERT INTO document_requests
+             (id, user_id, document, category, type, purpose, notes, status,
+              attachment_name, attachment_path, attachment_type, attachment_size)
+             VALUES (:id, :user_id, :document, :category, :type, :purpose, :notes, :status,
+              :attachment_name, :attachment_path, :attachment_type, :attachment_size)'
+        );
+        $stmt->execute([
+            ':id'              => $request['id'],
+            ':user_id'         => $request['user_id'],
+            ':document'        => $request['document'],
+            ':category'        => $request['category'],
+            ':type'            => $request['type'],
+            ':purpose'         => $request['purpose'],
+            ':notes'           => $request['notes'] ?? '',
+            ':status'          => $request['status'] ?? 'pending',
+            ':attachment_name' => $request['attachment_name'] ?? '',
+            ':attachment_path' => $request['attachment_path'] ?? '',
+            ':attachment_type' => $request['attachment_type'] ?? '',
+            ':attachment_size' => $request['attachment_size'] ?? 0,
+        ]);
+    }
+}
+
 if (!function_exists('queue_requests')) {
     /**
-     * All requests in one queue, with session status overrides applied.
+     * All requests — scoped to the logged-in user if student, all if admin.
      *
      * @return array<int, array<string, mixed>>
      */
     function queue_requests(): array
     {
-        $mockData = require APP_PATH . '/data/mock_dashboard.php';
-        $overrides = $_SESSION['request_statuses'] ?? [];
-
-        if (!is_array($overrides)) {
-            $overrides = [];
+        $user = auth_user();
+        if ($user === null) {
+            return [];
         }
 
-        $requests = [];
-
-        foreach (array_merge(submitted_requests(), $mockData['recentRequests']) as $request) {
-            $id = (string) ($request['id'] ?? '');
-            $status = $overrides[$id] ?? null;
-
-            if ($id !== '' && is_string($status) && in_array($status, request_statuses(), true)) {
-                $request['status'] = $status;
-            }
-
-            $requests[] = $request;
+        if ($user['role'] === 'admin') {
+            $stmt = db()->query(
+                'SELECT r.*, u.name AS requester_name, u.student_number AS requester_number
+                 FROM document_requests r
+                 JOIN users u ON u.id = r.user_id
+                 ORDER BY r.submitted_at DESC'
+            );
+        } else {
+            $stmt = db()->prepare(
+                'SELECT r.*, u.name AS requester_name, u.student_number AS requester_number
+                 FROM document_requests r
+                 JOIN users u ON u.id = r.user_id
+                 WHERE r.user_id = :uid
+                 ORDER BY r.submitted_at DESC'
+            );
+            $stmt->execute([':uid' => $user['id']]);
         }
 
-        return $requests;
+        $rows = $stmt->fetchAll();
+        $result = [];
+
+        foreach ($rows as $row) {
+            $result[] = array_merge($row, [
+                'date' => date('M d, Y', strtotime($row['submitted_at'])),
+            ]);
+        }
+
+        return $result;
     }
 }
 
 if (!function_exists('find_request')) {
-    /**
-     * @return array<string, mixed>|null
-     */
     function find_request(string $id): ?array
     {
-        foreach (queue_requests() as $request) {
-            if (($request['id'] ?? '') === $id) {
-                return $request;
-            }
+        $user = auth_user();
+        if ($user === null) {
+            return null;
         }
 
-        return null;
+        if ($user['role'] === 'admin') {
+            $stmt = db()->prepare(
+                'SELECT r.*, u.name AS requester_name, u.student_number AS requester_number
+                 FROM document_requests r
+                 JOIN users u ON u.id = r.user_id
+                 WHERE r.id = :id LIMIT 1'
+            );
+            $stmt->execute([':id' => $id]);
+        } else {
+            $stmt = db()->prepare(
+                'SELECT r.*, u.name AS requester_name, u.student_number AS requester_number
+                 FROM document_requests r
+                 JOIN users u ON u.id = r.user_id
+                 WHERE r.id = :id AND r.user_id = :uid LIMIT 1'
+            );
+            $stmt->execute([':id' => $id, ':uid' => $user['id']]);
+        }
+
+        $row = $stmt->fetch();
+        if (!$row) {
+            return null;
+        }
+
+        return array_merge($row, [
+            'date' => date('M d, Y', strtotime($row['submitted_at'])),
+        ]);
     }
 }
 
 if (!function_exists('update_request_status')) {
-    function update_request_status(string $id, string $status): void
+    function update_request_status(string $id, string $status, string $reason = ''): void
     {
         if (!in_array($status, request_statuses(), true)) {
             return;
         }
 
-        if (!isset($_SESSION['request_statuses']) || !is_array($_SESSION['request_statuses'])) {
-            $_SESSION['request_statuses'] = [];
-        }
+        $stmt = db()->prepare(
+            'UPDATE document_requests SET status = :status, rejection_reason = :reason WHERE id = :id'
+        );
+        $stmt->execute([':status' => $status, ':reason' => $reason, ':id' => $id]);
+    }
+}
 
-        $_SESSION['request_statuses'][$id] = $status;
-
-        if (!isset($_SESSION['document_requests']) || !is_array($_SESSION['document_requests'])) {
-            return;
+if (!function_exists('csrf_token')) {
+    function csrf_token(): string
+    {
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
+        return $_SESSION['csrf_token'];
+    }
+}
 
-        foreach ($_SESSION['document_requests'] as &$request) {
-            if (($request['id'] ?? '') === $id) {
-                $request['status'] = $status;
-            }
+if (!function_exists('csrf_verify')) {
+    function csrf_verify(): void
+    {
+        $token = (string) ($_POST['_csrf'] ?? '');
+        if (!hash_equals((string) ($_SESSION['csrf_token'] ?? ''), $token)) {
+            http_response_code(419);
+            die('Invalid CSRF token. Go back and try again.');
         }
-        unset($request);
+    }
+}
+
+if (!function_exists('auth_user')) {
+    /**
+     * @return array<string, string>|null
+     */
+    function auth_user(): ?array
+    {
+        $user = $_SESSION['auth_user'] ?? null;
+        return is_array($user) ? $user : null;
+    }
+}
+
+if (!function_exists('auth_guard')) {
+    /**
+     * Redirect to /login if no user is authenticated.
+     */
+    function auth_guard(): void
+    {
+        if (auth_user() === null) {
+            header('Location: ' . url('/login'));
+            exit;
+        }
+    }
+}
+
+if (!function_exists('admin_guard')) {
+    /**
+     * Redirect to /dashboard if the logged-in user is not an admin.
+     */
+    function admin_guard(): void
+    {
+        auth_guard();
+        $user = auth_user();
+        if (($user['role'] ?? 'student') !== 'admin') {
+            header('Location: ' . url('/dashboard'));
+            exit;
+        }
     }
 }
 

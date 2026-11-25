@@ -2,35 +2,18 @@
     <div>
         <h1 class="dashboard-title">Document Requests Dashboard</h1>
     </div>
-
-    <div class="context-switcher" role="group" aria-label="Dashboard context">
-        <a class="context-btn <?= $context === 'personal' ? 'active' : '' ?>"
-           href="<?= url('/dashboard') ?>?context=personal&amp;filter=all"
-           <?= $context === 'personal' ? 'aria-pressed="true"' : '' ?>>Personal</a>
-        <a class="context-btn <?= $context === 'organization' ? 'active' : '' ?>"
-           href="<?= url('/dashboard') ?>?context=organization&amp;filter=organization"
-           <?= $context === 'organization' ? 'aria-pressed="true"' : '' ?>>CEIT Student Council</a>
-    </div>
 </section>
 
 <section class="dashboard-welcome" aria-labelledby="welcome-heading">
     <img src="<?= url('assets/images/cvsu_logo.png') ?>" alt="" class="dashboard-logo">
     <div>
         <h2 id="welcome-heading" class="dashboard-greeting">
-            Welcome,
-            <strong><?= e($context === 'organization' ? $user['organization'] : $user['name']) ?></strong>
+            Welcome, <strong><?= e($user['name']) ?></strong>
         </h2>
-
-        <?php if ($context === 'organization'): ?>
-            <p class="dashboard-meta">
-                <?= e($user['organization_role']) ?> &middot; <?= e($user['course']) ?>
-            </p>
-            <p class="dashboard-meta">Representative: <?= e($user['name']) ?></p>
-        <?php else: ?>
-            <p class="dashboard-meta">
-                <?= e($user['student_number']) ?> &middot; <?= e($user['course']) ?>
-            </p>
-        <?php endif; ?>
+        <p class="dashboard-meta">
+            <?= e($user['student_number']) ?>
+            <?= $user['course'] !== '' ? ' &middot; ' . e($user['course']) : '' ?>
+        </p>
     </div>
 </section>
 

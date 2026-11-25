@@ -50,6 +50,9 @@
                 <span class="requester-badge requester-badge-<?= e($request['type']) ?>">
                     <?= e(ucfirst($request['type'])) ?>
                 </span>
+                <?php if (!empty($request['requester_name'])): ?>
+                    <span style="margin-left:.5rem"><?= e($request['requester_name']) ?> &middot; <?= e($request['requester_number'] ?? '') ?></span>
+                <?php endif; ?>
             </dd>
         </div>
         <?php if (!empty($request['purpose'])): ?>
